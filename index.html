@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#05060d">
+<meta name="description" content="DOTest — CPU, GPU & RAM benchmark for every device. By Ahmed Al-Zahrani">
+<meta name="author" content="Ahmed Al-Zahrani">
+<title>DOTest — دوت تست | CPU · GPU · RAM Benchmark</title>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ================= HEADER ================= -->
+  <header>
+    <div class="brand">
+      <img src="assets/logo.svg" alt="DOTest" class="logo">
+      <div>
+        <h1 class="en"><b>DOT</b>est</h1>
+        <small data-i18n="tagline"></small>
+      </div>
+    </div>
+    <div class="hdr-actions">
+      <span class="hbadge"><i></i><span data-i18n="allDevices"></span></span>
+      <button class="lang-btn" id="langBtn" aria-label="Language"><span class="en">EN</span> / عربي</button>
+    </div>
+  </header>
+
+  <!-- ================= HERO ================= -->
+  <section class="hero">
+    <div class="card hero-main">
+      <div class="kicker" data-i18n="detected"></div>
+      <div class="devname" id="devName"><span class="skeleton"></span></div>
+      <div class="devsub" id="devSub"><span class="skeleton" style="width:40%"></span></div>
+      <div class="chips" id="chips"></div>
+    </div>
+    <div class="card hero-art">
+      <img src="assets/hero.svg" alt="" aria-hidden="true">
+    </div>
+  </section>
+
+  <!-- ================= CONTROLS ================= -->
+  <section class="card panel" id="controls">
+    <div class="ptitle"><span class="dot"></span><span data-i18n="chooseLevel"></span></div>
+    <div class="levels" id="levels">
+      <button class="lvl" data-l="light"><h3>⚡ <span data-i18n="lv_light"></span></h3><p data-i18n="lv_light_d"></p><div class="bars"><span class="f"></span><span></span><span></span><span></span></div></button>
+      <button class="lvl on" data-l="medium"><h3>🔷 <span data-i18n="lv_medium"></span></h3><p data-i18n="lv_medium_d"></p><div class="bars"><span class="f"></span><span class="f"></span><span></span><span></span></div></button>
+      <button class="lvl" data-l="heavy"><h3>🔥 <span data-i18n="lv_heavy"></span></h3><p data-i18n="lv_heavy_d"></p><div class="bars"><span class="f"></span><span class="f"></span><span class="f"></span><span></span></div></button>
+      <button class="lvl x" data-l="extreme"><h3>☄️ <span class="xt" data-i18n="lv_extreme"></span></h3><p data-i18n="lv_extreme_d"></p><div class="bars"><span class="f"></span><span class="f"></span><span class="f"></span><span class="f"></span></div></button>
+    </div>
+
+    <div class="ptitle sm"><span class="dot"></span><span data-i18n="chooseMode"></span></div>
+    <div class="modes" id="modes">
+      <button class="mode on" data-m="full">🧪 <span data-i18n="m_full"></span></button>
+      <button class="mode" data-m="cpu">🧠 <span data-i18n="m_cpu"></span></button>
+      <button class="mode" data-m="gpu">🎮 <span data-i18n="m_gpu"></span></button>
+      <button class="mode" data-m="ram">💾 <span data-i18n="m_ram"></span></button>
+      <button class="mode stress" data-m="stress">🌋 <span data-i18n="m_stress"></span></button>
+    </div>
+    <p class="mode-desc" id="modeDesc"></p>
+
+    <div class="start-row">
+      <button class="btn btn-go" id="startBtn"></button>
+      <span class="est" id="est"></span>
+    </div>
+    <div class="warn" id="warnX" hidden data-i18n="warnExtreme"></div>
+  </section>
+
+  <!-- ================= LIVE ================= -->
+  <section class="card panel" id="live">
+    <div class="ptitle"><span class="dot pulse"></span><span id="liveTitle"></span></div>
+
+    <div class="stage" id="stage">
+      <canvas id="gl"></canvas>
+      <div class="hud" id="hud">
+        <div class="hud-top">
+          <div class="fpsbox"><div class="v en" id="hudFps">--</div><div class="l en">FPS</div></div>
+          <div class="hudinfo en" id="hudInfo"></div>
+        </div>
+        <div class="hud-bot">
+          <span class="hud-wm en">DOTest · Ahmed Al-Zahrani</span>
+          <button class="fsbtn" id="fsBtn">⛶ <span data-i18n="fullscreen"></span></button>
+        </div>
+      </div>
+      <div class="cpuview" id="cpuview">
+        <div class="cpuhead">
+          <div><div class="mu" id="cpuLbl"></div><div class="big en" id="cpuLive">0</div></div>
+          <div class="mu end"><span id="cpuUnit"></span><br><span class="en" id="cpuThreads"></span></div>
+        </div>
+        <div class="threads" id="threads"></div>
+      </div>
+    </div>
+
+    <div class="stress-live" id="stressLive" hidden>
+      <div class="sl"><span class="mu" data-i18n="s_cpu"></span><b class="en" id="slCpu">0</b></div>
+      <div class="sl"><span class="mu" data-i18n="s_gpu"></span><b class="en" id="slGpu">0</b></div>
+      <div class="sl"><span class="mu" data-i18n="s_ram"></span><b class="en" id="slRam">0</b></div>
+      <div class="sl"><span class="mu" data-i18n="s_time"></span><b class="en" id="slTime">0</b></div>
+    </div>
+
+    <canvas id="ft" class="chart-sm"></canvas>
+    <div class="prog">
+      <div class="prog-top"><b id="phase"></b><span class="en" id="pct">0%</span></div>
+      <div class="ptrack"><i id="pbar"></i></div>
+      <div class="steps" id="steps"></div>
+    </div>
+    <div class="start-row">
+      <button class="btn btn-stop" id="stopBtn">■ <span data-i18n="stop"></span></button>
+      <span class="est" data-i18n="dontLeave"></span>
+    </div>
+  </section>
+
+  <!-- ================= RESULTS ================= -->
+  <section id="results">
+    <div class="res-top">
+      <div class="card scorecard" id="scorecard">
+        <div class="ptitle center"><span class="dot"></span><span data-i18n="finalScore"></span></div>
+        <div class="ring">
+          <svg viewBox="0 0 200 200">
+            <defs>
+              <linearGradient id="rg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#00e5ff"/><stop offset="1" stop-color="#a855f7"/></linearGradient>
+              <linearGradient id="rg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff3d81"/><stop offset="1" stop-color="#ffc93c"/></linearGradient>
+            </defs>
+            <circle cx="100" cy="100" r="86" stroke="rgba(255,255,255,.07)" stroke-width="14" fill="none"/>
+            <circle id="ringC" cx="100" cy="100" r="86" stroke="url(#rg1)" stroke-width="14" fill="none" stroke-linecap="round" stroke-dasharray="540.35" stroke-dashoffset="540.35"/>
+          </svg>
+          <div class="c"><div class="s en" id="totScore">0</div><div class="sl en">DOTest Score</div></div>
+        </div>
+        <div class="tier" id="tier"></div>
+        <div class="res-meta" id="resMeta"></div>
+      </div>
+
+      <div class="res-side">
+        <div class="subs" id="subs"></div>
+        <div class="card panel" id="cpuPanel">
+          <div class="ptitle"><span class="dot"></span><span data-i18n="cpuDetails"></span></div>
+          <div class="cats" id="cats"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card panel" id="fpsPanel">
+      <div class="ptitle"><span class="dot"></span><span data-i18n="fpsDetails"></span></div>
+      <div class="fpsgrid" id="fpsgrid"></div>
+      <canvas id="fpschart" class="chart"></canvas>
+      <div class="note-sm" id="fpsNote"></div>
+    </div>
+
+    <div class="card panel" id="ramPanel">
+      <div class="ptitle"><span class="dot"></span><span data-i18n="ramDetails"></span></div>
+      <div class="fpsgrid" id="ramgrid"></div>
+      <div class="note-sm" id="ramNote"></div>
+    </div>
+
+    <div class="card panel" id="stressPanel">
+      <div class="ptitle"><span class="dot"></span><span data-i18n="stressDetails"></span></div>
+      <div class="fpsgrid" id="stressgrid"></div>
+      <canvas id="stresschart" class="chart tall"></canvas>
+      <div class="legend" id="stressLegend"></div>
+      <div class="note-sm" id="stressNote"></div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-go" id="againBtn">↻ <span data-i18n="retest"></span></button>
+      <button class="btn btn-ghost" id="copyBtn">📋 <span data-i18n="copy"></span></button>
+      <button class="btn btn-ghost" id="imgBtn">🖼️ <span data-i18n="saveImg"></span></button>
+      <button class="btn btn-ghost" id="jsonBtn">📄 <span data-i18n="saveJson"></span></button>
+    </div>
+  </section>
+
+  <!-- ================= SPECS ================= -->
+  <section class="specs">
+    <div class="ptitle lg"><span class="dot"></span><span data-i18n="allSpecs"></span></div>
+    <div class="info-grid" id="info"></div>
+    <div class="note" data-i18n-html="privacyNote"></div>
+  </section>
+
+  <!-- ================= HISTORY ================= -->
+  <section class="card panel">
+    <div class="ptitle"><span class="dot"></span><span data-i18n="history"></span>
+      <button class="clear-btn" id="clearHist" data-i18n="clear"></button></div>
+    <div class="hist" id="hist"></div>
+  </section>
+
+  <!-- ================= FOOTER ================= -->
+  <footer>
+    <div class="fb"><img src="assets/logo.svg" alt=""><span class="en fbn">DOTest</span><span class="ver en" id="ver"></span></div>
+    <div class="cr">© <span class="en" id="yr"></span> <span class="en grad">Ahmed Al-Zahrani</span> — <span data-i18n="rights"></span></div>
+    <small><span data-i18n="madeBy"></span> <span class="en">Ahmed Al-Zahrani</span></small>
+  </footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Scripts (order matters) -->
+<script src="js/config.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/data/devices.js"></script>
+<script src="js/detect.js"></script>
+<script src="js/bench/kernels.js"></script>
+<script src="js/bench/workers.js"></script>
+<script src="js/bench/cpu.js"></script>
+<script src="js/bench/ram.js"></script>
+<script src="js/bench/shaders.js"></script>
+<script src="js/bench/gpu.js"></script>
+<script src="js/bench/stress.js"></script>
+<script src="js/ui/charts.js"></script>
+<script src="js/ui/render.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
