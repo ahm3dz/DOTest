@@ -45,13 +45,13 @@ DOT.stress = (function () {
       lastCpu = c; lastRam = r; lastT = now;
       series.cpu.push({ t: t, v: cpuRate * DOT.config.score.cpuRound });
       series.ram.push({ t: t, v: ramBW });
-      series.gpu.push({ t: t, v: gpuNow.thr / DOT.config.score.gpuDiv });
+      series.gpu.push({ t: t, v: gpuNow.thr / DOT.gpu.gpuDiv(o.scene || DOT.gpu.scene()) });
       series.fps.push({ t: t, v: gpuNow.fps });
-      o.onSample && o.onSample({ t: t, cpu: cpuRate * DOT.config.score.cpuRound, ram: ramBW, gpu: gpuNow.thr / DOT.config.score.gpuDiv, fps: gpuNow.fps, frac: Math.min(1, t / dur) });
+      o.onSample && o.onSample({ t: t, cpu: cpuRate * DOT.config.score.cpuRound, ram: ramBW, gpu: gpuNow.thr / DOT.gpu.gpuDiv(o.scene || DOT.gpu.scene()), fps: gpuNow.fps, frac: Math.min(1, t / dur) });
     }, 1000);
 
     var gpuP = DOT.gpu.render({
-      L: L, dur: dur, fixedFrac: 0, refresh: o.refresh, ctl: ctl, maxFrameMs: 40,
+      L: L, dur: dur, fixedFrac: 0, refresh: o.refresh, ctl: ctl, maxFrameMs: 40, scene: o.scene, resMul: o.resMul,
       onTick: function (tk) { gpuNow = tk; o.onTick && o.onTick(tk); }
     }).catch(function (e) {
       if (e === 'abort') throw e;

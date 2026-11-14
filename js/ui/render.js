@@ -17,21 +17,35 @@ DOT.render = (function () {
 
   /* ---------- Device / specs ---------- */
   function device(I) {
+    var A = DOT.agent && DOT.agent.summary();
+    u.$('#exactLink').hidden = !!A || I.isMobile; u.$('#specsCta').hidden = !!A || I.isMobile;
+    if (A) I = Object.assign({}, I, { chip: A.cpu || I.chip, chipEst: false, cores: A.threads || I.cores, memExact: A.ramBytes, gpuName: A.gpu || I.gpuName, name: (!I.isMobile && A.model) ? A.model : I.name });
     u.$('#devName').textContent = deviceName(I);
     u.$('#devSub').textContent = [t(I.type), I.os ? I.os + (I.osv ? ' ' + I.osv : '') : null, I.browser ? I.browser + (I.browserV ? ' ' + I.browserV.split('.')[0] : '') : null].filter(Boolean).join(' · ');
     var chips = [
       ['🧠', I.chip ? I.chip : null],
       ['⚙️', I.cores ? t('chipCores', { n: I.cores }) : null],
-      ['💾', I.mem ? (I.mem >= 8 && !I.isMobile ? '8GB+ RAM' : I.mem + 'GB RAM') : null],
+      ['💾', I.memExact ? u.GB(I.memExact) + ' RAM' : I.mem ? (I.mem >= 8 && !I.isMobile ? '8GB+ RAM' : I.mem + 'GB RAM') : null],
       ['🎮', I.gpuName || null],
       ['🖼️', I.physW + '×' + I.physH],
       ['⚡', I.hz + 'Hz']
     ].filter(function (c) { return c[1]; });
     u.$('#chips').innerHTML = chips.map(function (c) { return '<div class="chip"><span>' + c[0] + '</span><b class="ltr">' + u.esc(c[1]) + '</b></div>'; }).join('');
-    u.$('#info').innerHTML = I.groups.map(function (g) {
+    var groups = I.groups;
+    if (A) groups = groups.map(function (g) {
+      return Object.assign({}, g, { rows: g.rows.map(function (r) {
+        if (r.k === 'r_chip' && A.cpu) return { k: r.k, v: A.cpu, ag: true };
+        if (r.k === 'r_threads' && A.threads) return { k: r.k, v: (A.cores ? A.cores + ' Cores / ' : '') + A.threads + ' Threads', ag: true };
+        if (r.k === 'r_ram' && A.ramBytes) return { k: r.k, v: u.GB(A.ramBytes), ag: true };
+        if (r.k === 'r_gpu' && A.gpu) return { k: r.k, v: A.gpu + (A.vram ? ' · ' + u.GB(A.vram) + ' VRAM' : ''), ag: true };
+        if (r.k === 'r_name' && A.model && !I.isMobile) return { k: r.k, v: A.model, ag: true };
+        return r;
+      }) });
+    });
+    u.$('#info').innerHTML = groups.map(function (g) {
       return '<div class="card ig"><h4><span class="ic">' + g.ic + '</span>' + t(g.t) + '</h4>' + g.rows.map(function (r) {
         var v = val(r.v), na = v == null;
-        var tag = !na && r.est ? '<span class="tag">' + t('estimated') + '</span>' : !na && r.live ? '<span class="tag ok">' + t('measured') + '</span>' : '';
+        var tag = !na && r.ag ? '<span class="tag ok">' + t('ag_tag') + '</span>' : !na && r.est ? '<span class="tag">' + t('estimated') + '</span>' : !na && r.live ? '<span class="tag ok">' + t('measured') + '</span>' : '';
         return '<div class="row"><span class="k">' + t(r.k) + '</span><span class="v' + (na ? ' na' : '') + '"><bdi>' + (na ? t('NA') : u.esc(v)) + '</bdi>' + tag + '</span></div>';
       }).join('') + '</div>';
     }).join('');
@@ -76,6 +90,16 @@ DOT.render = (function () {
     var te = u.$('#tier'); te.textContent = t('tierLabel', { t: t(T[1]) }); te.style.background = T[2] + '22'; te.style.color = T[2]; te.style.border = '1px solid ' + T[2] + '66';
     u.$('#resMeta').innerHTML = u.esc(I ? deviceName(I) : '') + '<br>' + t('mode_' + r.mode) + ' · ' + lvlName + ' · <span class="ltr">' + new Date(r.date).toLocaleString(DOT.lang === 'ar' ? 'ar-SA-u-nu-latn' : 'en-US') + '</span>';
 
+    // compare with your best previous run of the same level & mode
+    var hist = u.store.get('hist', []).filter(function (x) { return x.l === r.level && x.m === r.mode && x.d !== r.date; });
+    var best = hist.reduce(function (m, x) { return Math.max(m, x.t); }, 0);
+    u.$('#cmp').innerHTML = best ? (tot >= best ? '🏆 ' + t('cmp_best') : t('cmp_vs', { p: ((tot / best - 1) * 100).toFixed(0) })) : '';
+
+    // advice
+    var adv = DOT.advice(r, I, DOT.netUI && DOT.netUI.last());
+    u.$('#advPanel').style.display = adv.length ? '' : 'none';
+    u.$('#adv').innerHTML = adv.map(function (a) { return '<div class="ad ' + a.lvl + '"><i>' + { good: '✅', warn: '⚠️', bad: '⛔', info: '💡' }[a.lvl] + '</i><span>' + u.esc(t(a.key, a.vars)) + '</span></div>'; }).join('');
+
     // sub cards
     var subs = [];
     function sub(key, score, max, desc, grad) {
@@ -114,7 +138,7 @@ DOT.render = (function () {
       var comp = g.compute ? (g.compute.best >= 1000 ? (g.compute.best / 1000).toFixed(2) + ' TFLOPS' : u.fmt(g.compute.best) + ' GFLOPS') : '—';
       u.$('#fpsgrid').innerHTML = fg(t('f_avg'), u.fmt(g.avg, 1), '#00e5ff') + fg(t('f_max'), u.fmt(g.max)) + fg(t('f_min'), u.fmt(g.min, 1)) + fg(t('f_low'), u.fmt(g.low, 1)) +
         fg(t('f_stab'), u.fmt(g.stab) + '%') + fg(t('f_tflops'), '<span style="font-size:15px">' + comp + '</span>', '#ffc93c') + fg(t('f_res'), '<span style="font-size:14px">' + g.w + '×' + g.h + '</span>') + fg(t('f_frames'), u.fmt(g.frames));
-      u.$('#fpsNote').textContent = t('fpsNote', { hz: r.refresh || 60, k: Math.round(g.avgK) }) + (g.compute ? '' : ' · ' + t('noCompute'));
+      u.$('#fpsNote').textContent = t('sc_' + (g.scene || 'mandelbulb')) + ' · ' + t('fpsNote', { hz: r.refresh || 60, k: Math.round(g.avgK) }) + (g.compute ? '' : ' · ' + t('noCompute'));
       setTimeout(function () {
         var sw = g.series.filter(function (p) { return p.p === 2; })[0];
         DOT.charts.lines(u.$('#fpschart'), [{ data: g.series.map(function (p) { return { t: p.t, v: p.f }; }), color: '#00e5ff', fill: true }], { yMax: Math.max((r.refresh || 60) * 1.1, Math.max.apply(null, g.series.map(function (p) { return p.f; }))), yLabel: 'FPS', shadeFrom: sw ? sw.t : null, shadeLabel: t('maxLoad') });
@@ -150,11 +174,19 @@ DOT.render = (function () {
   /* ---------- History ---------- */
   function history() {
     var h = u.store.get('hist', []);
-    if (!h.length) { u.$('#hist').innerHTML = '<div class="empty">' + t('histEmpty') + '</div>'; return; }
+    var bestBy = {};
+    h.forEach(function (x) { var k = x.m; if (!bestBy[k] || x.t > bestBy[k].t) bestBy[k] = x; });
+    u.$('#best').innerHTML = Object.keys(bestBy).length ? Object.keys(bestBy).map(function (k) {
+      var x = bestBy[k]; return '<div class="fg"><div class="v en">' + u.fmt(x.t) + '</div><div class="l">' + t('mode_' + k) + ' · ' + t('lv_' + x.l) + '</div></div>';
+    }).join('') : '<div class="empty">' + t('histEmpty') + '</div>';
+    if (!h.length) { u.$('#hist').innerHTML = '<div class="empty">' + t('histEmpty') + '</div>'; u.$('#histChart').style.display = 'none'; return; }
     u.$('#hist').innerHTML = h.map(function (x) {
       var extra = [x.f ? x.f + ' FPS' : '', x.rb ? x.rb + ' GB/s' : '', x.st ? x.st + '%' : ''].filter(Boolean).join(' · ');
-      return '<div class="hi"><div><b>' + t('lv_' + x.l) + '</b> · ' + t('mode_' + x.m) + '<div class="mu"><span class="ltr">' + new Date(x.d).toLocaleString(DOT.lang === 'ar' ? 'ar-SA-u-nu-latn' : 'en-US') + '</span>' + (extra ? ' · <span class="ltr">' + extra + '</span>' : '') + '</div></div><div class="s en">' + u.fmt(x.t) + '</div></div>';
+      return '<div class="hi"><div><b>' + t('lv_' + x.l) + '</b> · ' + t('mode_' + x.m) + (x.sc ? ' · ' + t('sc_' + x.sc) : '') + '<div class="mu"><span class="ltr">' + new Date(x.d).toLocaleString(DOT.lang === 'ar' ? 'ar-SA-u-nu-latn' : 'en-US') + '</span>' + (extra ? ' · <span class="ltr">' + extra + '</span>' : '') + '</div></div><div class="s en">' + u.fmt(x.t) + '</div></div>';
     }).join('');
+    var c = u.$('#histChart');
+    if (h.length > 1 && c.offsetParent !== null) { c.style.display = ''; var pts = h.slice().reverse().map(function (x, i) { return { t: i + 1, v: x.t }; }); DOT.charts.lines(c, [{ data: pts, color: '#00e5ff', fill: true }], { yLabel: 'Score' }); }
+    else c.style.display = h.length > 1 ? '' : 'none';
   }
 
   /* ---------- Shareable text ---------- */
@@ -172,14 +204,14 @@ DOT.render = (function () {
     if (r.gpu) L.push('🎮 ' + t('sub_gpu').replace('🎮 ', '') + ': ' + u.fmt(r.gpu.score) + ' · ' + u.fmt(r.gpu.avg, 1) + ' FPS · 1% Low ' + u.fmt(r.gpu.low, 1) + (r.gpu.compute ? ' · ' + u.fmt(r.gpu.compute.best) + ' GFLOPS' : ''));
     if (r.ram) L.push('💾 RAM: ' + u.fmt(r.ram.score) + ' · ' + r.ram.bw.toFixed(1) + ' GB/s · ' + r.ram.lat.toFixed(0) + ' ns');
     if (r.stress) L.push('🌋 ' + t('sx_stab') + ': ' + u.fmt(r.stress.stability) + '% · ' + t('sx_throttle') + ': ' + u.fmt(r.stress.throttle) + '%');
-    L.push(''); L.push('© Ahmed Al-Zahrani');
+    L.push(''); L.push('© Ahmed Al-Zahrani' + (u.siteURL() ? '\n🔗 ' + u.siteURL() : ''));
     return L.join('\n');
   }
 
   /* ---------- Result image (PNG card) ---------- */
   function image(r, I) {
     var W = 1080, H = 1350, c = document.createElement('canvas'); c.width = W; c.height = H;
-    var x = c.getContext('2d'), rtl = DOT.lang === 'ar';
+    var x = c.getContext('2d'), rtl = DOT.lang === 'ar', A0 = DOT.agent && DOT.agent.summary();
     var g = x.createLinearGradient(0, 0, W, H); g.addColorStop(0, '#0b0e24'); g.addColorStop(1, '#05060d'); x.fillStyle = g; x.fillRect(0, 0, W, H);
     var rg = x.createRadialGradient(W * 0.85, 0, 0, W * 0.85, 0, 700); rg.addColorStop(0, 'rgba(0,229,255,.22)'); rg.addColorStop(1, 'rgba(0,229,255,0)'); x.fillStyle = rg; x.fillRect(0, 0, W, H);
     var gr = x.createLinearGradient(0, 0, 200, 200); gr.addColorStop(0, '#00e5ff'); gr.addColorStop(1, '#a855f7');
@@ -191,8 +223,8 @@ DOT.render = (function () {
     x.fillStyle = '#e9edff'; x.font = '900 54px Orbitron, sans-serif'; x.textAlign = 'left'; x.direction = 'ltr'; x.fillText('DOTest', 190, 135);
     x.fillStyle = '#8f97bd'; x.font = '500 26px Tajawal, sans-serif'; x.fillText('CPU · GPU · RAM Benchmark', 192, 175);
     x.textAlign = 'center'; x.direction = rtl ? 'rtl' : 'ltr';
-    x.fillStyle = '#e9edff'; x.font = '800 44px Tajawal, sans-serif'; x.fillText(deviceName(I).slice(0, 40), W / 2, 300);
-    x.fillStyle = '#8f97bd'; x.font = '500 28px Tajawal, sans-serif'; x.fillText([I.chip, I.gpuName].filter(Boolean).join(' · ').slice(0, 60), W / 2, 350);
+    x.fillStyle = '#e9edff'; x.font = '800 44px Tajawal, sans-serif'; x.fillText(((A0 && !I.isMobile && A0.model) || deviceName(I)).slice(0, 40), W / 2, 300);
+    var A = DOT.agent && DOT.agent.summary(); x.fillStyle = '#8f97bd'; x.font = '500 28px Tajawal, sans-serif'; x.fillText([(A && A.cpu) || I.chip, (A && A.gpu) || I.gpuName].filter(Boolean).join(' · ').slice(0, 64), W / 2, 350);
     // ring
     x.lineWidth = 26; x.strokeStyle = 'rgba(255,255,255,.08)'; x.beginPath(); x.arc(W / 2, 600, 190, 0, Math.PI * 2); x.stroke();
     x.strokeStyle = gr; x.lineCap = 'round'; x.beginPath(); x.arc(W / 2, 600, 190, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * Math.min(1, r.total / cfg.score.ringMax)); x.stroke();
@@ -213,9 +245,21 @@ DOT.render = (function () {
       x.textAlign = rtl ? 'right' : 'left'; x.fillText(row[0], rtl ? W - 110 : 110, y);
       x.textAlign = rtl ? 'left' : 'right'; x.direction = 'ltr'; x.fillStyle = '#00e5ff'; x.font = '900 30px Orbitron, sans-serif'; x.fillText(row[1], rtl ? 110 : W - 110, y);
     });
+    // footer: level/date, site link, QR, rights
+    var url = u.siteURL(), host = u.siteHost();
     x.textAlign = 'center'; x.direction = 'ltr'; x.fillStyle = '#8f97bd'; x.font = '600 24px Tajawal, sans-serif';
-    x.fillText(t('lv_' + r.level) + ' · ' + new Date(r.date).toLocaleDateString('en-GB'), W / 2, H - 90);
-    x.fillStyle = gr; x.font = '900 28px Orbitron, sans-serif'; x.fillText('© Ahmed Al-Zahrani', W / 2, H - 45);
+    var cx = url ? W / 2 - 80 : W / 2;
+    x.fillText(t('lv_' + r.level) + ' · ' + t('mode_' + r.mode) + ' · ' + new Date(r.date).toLocaleDateString('en-GB'), cx, H - 120);
+    if (host) { x.fillStyle = '#e9edff'; x.font = '800 28px Orbitron, sans-serif'; x.fillText('🔗 ' + host.slice(0, 34), cx, H - 78); }
+    x.fillStyle = gr; x.font = '900 28px Orbitron, sans-serif'; x.fillText('© Ahmed Al-Zahrani', cx, H - 36);
+    if (url && window.qrcode) {
+      try {
+        var q = qrcode(0, 'M'); q.addData(url); q.make();
+        var n = q.getModuleCount(), size = 150, cell = size / (n + 2), qx = W - 80 - size, qy = H - 30 - size;
+        x.fillStyle = '#ffffff'; x.fillRect(qx, qy, size, size); x.fillStyle = '#05060d';
+        for (var rr = 0; rr < n; rr++) for (var cc = 0; cc < n; cc++) if (q.isDark(rr, cc)) x.fillRect(qx + (cc + 1) * cell, qy + (rr + 1) * cell, Math.ceil(cell), Math.ceil(cell));
+      } catch (e) { }
+    }
     return c.toDataURL('image/png');
   }
 

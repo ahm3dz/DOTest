@@ -1,0 +1,183 @@
+{
+  "agent": "DOTest-Agent",
+  "version": "1.0",
+  "platform": "windows",
+  "generated": "2026-11-14T03:08:53",
+  "system": {
+    "name": null,
+    "manufacturer": "ASUS",
+    "model": "ROG Strix G16",
+    "family": "ROG",
+    "sku": "G614JV",
+    "type": "Laptop",
+    "serial": "N4NRKD000123456",
+    "uuid": "4C4C4544-0042-3510-8051-B4C04F4E4E32",
+    "chassisSerial": "N4NRKD000123456",
+    "assetTag": "No Asset Tag"
+  },
+  "os": {
+    "name": "Microsoft Windows 11 Pro",
+    "version": "10.0.26100",
+    "build": "26100",
+    "ubr": null,
+    "displayVersion": null,
+    "edition": null,
+    "arch": "64-bit",
+    "installDate": "2026-01-18T03:08:53",
+    "lastBoot": "2026-11-13T22:08:53",
+    "uptimeHours": 5.0,
+    "user": null,
+    "productId": null
+  },
+  "cpu": [
+    {
+      "name": "13th Gen Intel(R) Core(TM) i7-13650HX",
+      "manufacturer": "GenuineIntel",
+      "cores": 14,
+      "threads": 20,
+      "maxClockMHz": 2600,
+      "currentClockMHz": 2600,
+      "l2KB": 11776,
+      "l3KB": 24576,
+      "socket": "U3E1",
+      "processorId": "BFEBFBFF000B0671",
+      "serial": null,
+      "virtualization": true,
+      "loadPercent": 7,
+      "description": "Intel64 Family 6"
+    }
+  ],
+  "ram": {
+    "totalBytes": 34155622400,
+    "installedBytes": 34359738368,
+    "slots": 2,
+    "maxBytes": 68719476736,
+    "modules": [
+      {
+        "slot": "DIMM A",
+        "bank": "BANK 0",
+        "capacityBytes": 17179869184,
+        "speedMHz": 4800,
+        "configuredMHz": 4800,
+        "type": "DDR5",
+        "formFactor": "SODIMM",
+        "manufacturer": "Samsung",
+        "partNumber": "M425R2GA3BB0-CQKOD",
+        "serial": "4A1B2C3D",
+        "voltageMV": 1100
+      },
+      {
+        "slot": "DIMM B",
+        "bank": "BANK 2",
+        "capacityBytes": 17179869184,
+        "speedMHz": 4800,
+        "configuredMHz": 4800,
+        "type": "DDR5",
+        "formFactor": "SODIMM",
+        "manufacturer": "Samsung",
+        "partNumber": "M425R2GA3BB0-CQKOD",
+        "serial": "4A1B2C3E",
+        "voltageMV": 1100
+      }
+    ]
+  },
+  "gpu": [
+    {
+      "name": "NVIDIA GeForce RTX 4060 Laptop GPU",
+      "vendor": "NVIDIA",
+      "vramBytes": 4293918720,
+      "driver": "32.0.15.6094",
+      "driverDate": "2024-09-10T00:00:00",
+      "resolution": "2560 x 1600",
+      "refreshHz": 240,
+      "pnpId": "PCI\\VEN_10DE"
+    }
+  ],
+  "motherboard": {
+    "manufacturer": "ASUSTeK",
+    "product": "G614JV",
+    "version": "1.0",
+    "serial": "MB-0000123"
+  },
+  "bios": {
+    "vendor": "American Megatrends",
+    "version": "G614JV.320",
+    "date": "2024-03-01T00:00:00",
+    "serial": "N4NRKD000123456",
+    "mode": "Legacy",
+    "secureBoot": null
+  },
+  "disks": [
+    {
+      "model": "Micron 2400 MTFDKBA1T0QFM",
+      "sizeBytes": 1024203640320,
+      "serial": "2312E6A1B2C3",
+      "firmware": "V3MA003",
+      "interface": "SCSI",
+      "bus": "NVMe",
+      "media": "SSD",
+      "health": "Healthy",
+      "partitions": 4
+    }
+  ],
+  "volumes": [
+    {
+      "drive": "C:",
+      "label": "OS",
+      "fs": "NTFS",
+      "sizeBytes": 1000000000000,
+      "freeBytes": 420000000000,
+      "serial": "A1B2C3D4"
+    }
+  ],
+  "network": [
+    {
+      "name": "Intel(R) Wi-Fi 6E AX211 160MHz",
+      "conn": "Wi-Fi",
+      "mac": "A4:6B:B6:12:34:56",
+      "ipv4": [
+        "192.168.1.23"
+      ],
+      "ipv6": [
+        "fe80::1c2d:3e4f"
+      ],
+      "subnet": [
+        "255.255.255.0"
+      ],
+      "gateway": [
+        "192.168.1.1"
+      ],
+      "dns": [
+        "192.168.1.1"
+      ],
+      "dhcp": true,
+      "speedMbps": 1201.0
+    }
+  ],
+  "monitors": [
+    {
+      "manufacturer": "BOE",
+      "model": null,
+      "productCode": "0B9B",
+      "serial": null,
+      "year": 2023
+    }
+  ],
+  "battery": {
+    "name": "ASUS Battery",
+    "chargePercent": 87,
+    "status": 2,
+    "designMWh": 90000,
+    "fullMWh": 84150,
+    "cycles": 112,
+    "serial": "BAT123",
+    "manufacturer": "ASUS",
+    "healthPercent": 93.5
+  },
+  "tpm": null,
+  "audio": [
+    "Realtek(R) Audio",
+    "NVIDIA High Definition Audio"
+  ],
+  "sample": true
+}

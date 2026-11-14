@@ -6,12 +6,33 @@
 var DOT = window.DOT = window.DOT || {};
 
 DOT.gpu = (function () {
-  var u = DOT.u, S = { gl: null, prog: null, loc: null, lost: false, listen: false };
+  var u = DOT.u, S = { gl: null, prog: null, loc: null, lost: false, listen: false, progs: {}, scene: null };
 
   function canvas() { return u.$('#gl'); }
 
-  function init() {
-    if (S.gl && !S.gl.isContextLost()) return S.gl;
+  function scene() { return (DOT.settings && DOT.settings.get('scene')) || 'mandelbulb'; }
+
+  /* Compile (and cache) the program for a scene */
+  function useScene(gl, name) {
+    if (S.progs[name]) { S.prog = S.progs[name].p; S.loc = S.progs[name].loc; S.scene = name; return; }
+    function sh(t, src) {
+      var s = gl.createShader(t); gl.shaderSource(s, src); gl.compileShader(s);
+      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error('Shader: ' + gl.getShaderInfoLog(s));
+      return s;
+    }
+    var p = gl.createProgram();
+    gl.attachShader(p, sh(gl.VERTEX_SHADER, DOT.shaders.vertex));
+    gl.attachShader(p, sh(gl.FRAGMENT_SHADER, DOT.shaders.fragment(name)));
+    gl.bindAttribLocation(p, 0, 'a'); gl.linkProgram(p);
+    if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error('Program: ' + gl.getProgramInfoLog(p));
+    var loc = { res: gl.getUniformLocation(p, 'uRes'), time: gl.getUniformLocation(p, 'uTime'), iter: gl.getUniformLocation(p, 'uIter'), k: gl.getUniformLocation(p, 'uK') };
+    S.progs[name] = { p: p, loc: loc }; S.prog = p; S.loc = loc; S.scene = name;
+  }
+
+  function init(name) {
+    name = name || scene();
+    if (S.gl && !S.gl.isContextLost()) { useScene(S.gl, name); return S.gl; }
+    S.progs = {};
     var c = canvas();
     if (!S.listen) {
       S.listen = true;
@@ -21,21 +42,10 @@ DOT.gpu = (function () {
     var o = { antialias: false, alpha: false, depth: false, stencil: false, powerPreference: 'high-performance', preserveDrawingBuffer: false };
     var gl = c.getContext('webgl2', o) || c.getContext('webgl', o) || c.getContext('experimental-webgl', o);
     if (!gl) throw new Error('nogl');
-    function sh(t, src) {
-      var s = gl.createShader(t); gl.shaderSource(s, src); gl.compileShader(s);
-      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error('Shader: ' + gl.getShaderInfoLog(s));
-      return s;
-    }
-    var p = gl.createProgram();
-    gl.attachShader(p, sh(gl.VERTEX_SHADER, DOT.shaders.vertex));
-    gl.attachShader(p, sh(gl.FRAGMENT_SHADER, DOT.shaders.fragment));
-    gl.bindAttribLocation(p, 0, 'a'); gl.linkProgram(p);
-    if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error('Program: ' + gl.getProgramInfoLog(p));
     var b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
     gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
-    S.prog = p;
-    S.loc = { res: gl.getUniformLocation(p, 'uRes'), time: gl.getUniformLocation(p, 'uTime'), iter: gl.getUniformLocation(p, 'uIter'), k: gl.getUniformLocation(p, 'uK') };
+    useScene(gl, name);
     S.gl = gl; S.lost = false;
     return gl;
   }
@@ -60,14 +70,15 @@ DOT.gpu = (function () {
     for (var k = 0; k < K; k++) { gl.uniform1f(S.loc.time, t + k * 0.0004); gl.drawArrays(gl.TRIANGLES, 0, 3); }
   }
 
-  function preview() { try { var gl = init(); size(0.6); draw(gl, 2.2, 64, 1); } catch (e) { } }
+  function gpuDiv(name) { var d = DOT.config.score.gpuDiv; return typeof d === 'object' ? (d[name] || d.mandelbulb) : d; }
+  function preview() { try { var gl = init(); size(0.6); draw(gl, 3.0, 96, 1); } catch (e) { } }
 
   /* render({L, dur(s), fixedFrac, refresh, ctl, onTick(t)})
      Phase 1 (fixedFrac): K=1 → real FPS. Phase 2: K adapts upward until the GPU is saturated. */
   function render(o) {
     return new Promise(function (resolve, reject) {
-      var gl; try { gl = init(); } catch (e) { return reject(e); }
-      var L = o.L, wh = size(L.res), px = wh[0] * wh[1];
+      var gl; try { gl = init(o.scene); } catch (e) { return reject(e); }
+      var L = o.L, wh = size(L.res * (o.resMul || 1)), px = wh[0] * wh[1];
       var dur = o.dur * 1000, fixedDur = dur * o.fixedFrac, t0 = 0, prev = 0, K = 1;
       var frames = [], series = [], recent = [], work = 0, wStart = 0, measuring = false;
       var winN = 0, winT = 0, winWork = 0, kSum = 0, kN = 0, ft = [];
@@ -115,7 +126,7 @@ DOT.gpu = (function () {
         var thr = measuring && el2 > 0 ? work / el2 : px * L.iter * avg;
         resolve({
           avg: avg, low: low, max: Math.min(mx, (o.refresh || 60) * 1.05), min: mn, stab: Math.min(100, low / avg * 100),
-          thr: thr, score: thr / DOT.config.score.gpuDiv, series: series, w: wh[0], h: wh[1], avgK: kN ? kSum / kN : 1, frames: fr.length
+          thr: thr, score: thr / gpuDiv(S.scene), scene: S.scene, series: series, w: wh[0], h: wh[1], avgK: kN ? kSum / kN : 1, frames: fr.length
         });
       }
       requestAnimationFrame(function (t) { t0 = t; prev = t; winT = t; requestAnimationFrame(loop); });
@@ -167,5 +178,5 @@ DOT.gpu = (function () {
       function (e) { try { device && device.destroy(); } catch (x) { } if (e === 'abort') throw e; return null; });
   }
 
-  return { init: init, preview: preview, render: render, compute: compute };
+  return { init: init, preview: preview, render: render, compute: compute, gpuDiv: gpuDiv, scene: scene };
 })();

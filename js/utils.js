@@ -31,6 +31,34 @@ DOT.u = {
     set: function (k, v) { try { localStorage.setItem(DOT.config.storageKey + '_' + k, JSON.stringify(v)); } catch (e) { } }
   },
 
+  /* The site's own address — from config, or detected automatically */
+  siteURL: function () {
+    if (DOT.config.siteURL) return DOT.config.siteURL.replace(/\/?$/, '/');
+    try {
+      if (!/^https?:$/.test(location.protocol)) return '';
+      var p = location.pathname.replace(/[^\/]*\.html?$/i, '');
+      return location.origin + (p.charAt(p.length - 1) === '/' ? p : p + '/');
+    } catch (e) { return ''; }
+  },
+  siteHost: function () { var s = DOT.u.siteURL(); return s ? s.replace(/^https?:\/\//, '').replace(/\/$/, '') : ''; },
+
+  /* Short beep + vibration when a test finishes (respects settings) */
+  notify: function () {
+    var S = DOT.settings;
+    if (!S || S.get('sound')) {
+      try {
+        var A = window.AudioContext || window.webkitAudioContext, a = DOT.u._ac || (DOT.u._ac = new A());
+        [880, 1320].forEach(function (f, i) {
+          var o = a.createOscillator(), g = a.createGain(); o.frequency.value = f; g.gain.value = 0.0001;
+          o.connect(g).connect(a.destination); var t0 = a.currentTime + i * 0.16;
+          g.gain.exponentialRampToValueAtTime(0.12, t0 + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.15);
+          o.start(t0); o.stop(t0 + 0.16);
+        });
+      } catch (e) { }
+    }
+    if ((!S || S.get('vibrate')) && navigator.vibrate) try { navigator.vibrate([60, 40, 60]); } catch (e) { }
+  },
+
   /* Download a file (works when self-hosted) */
   download: function (name, data, type) {
     try {
