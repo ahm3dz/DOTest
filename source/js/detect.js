@@ -240,16 +240,16 @@ DOT.detect = (function () {
       var gpuK = gpuKind(gpuName);
 
       /* ---- Device type ---- */
-      var type = 'dt_desktop', typeIc = '🖥️';
+      var type = 'dt_desktop', typeIc = 'desktop';
       var isTablet = isIPad || (ch.formFactors || []).indexOf('Tablet') >= 0 || (isAndroid && (!/Mobile/i.test(ua) || minS >= 600)) || /Tablet|Kindle|Silk|PlayBook/i.test(ua);
-      if (isTablet) { type = 'dt_tablet'; typeIc = '📲'; }
-      else if (isIPhone || isAndroid || ch.mobile || /Mobi|Phone/i.test(ua)) { type = 'dt_phone'; typeIc = '📱'; }
-      else if (bat && (bat.charging === false || bat.level < 1 || (isFinite(bat.dischargingTime) && bat.dischargingTime > 0) || (bat.chargingTime > 0 && isFinite(bat.chargingTime)))) { type = 'dt_laptop'; typeIc = '💻'; }
-      else if (/Macintosh/.test(ua) && !isIPad) { type = 'dt_mac'; typeIc = '💻'; }
-      else if (gpuK === 'gk_integrated') { type = 'dt_pc'; typeIc = '💻'; }
-      if (/SMART-TV|SmartTV|Tizen|Web0S|webOS|AFT[A-Z]|BRAVIA|CrKey|GoogleTV|Android TV|HbbTV/i.test(ua)) { type = 'dt_tv'; typeIc = '📺'; }
-      if (/PlayStation|Xbox|Nintendo/i.test(ua)) { type = 'dt_console'; typeIc = '🎮'; }
-      if (/OculusBrowser|Quest|Pico|Vision/i.test(ua) && !isIPhone) { if (/OculusBrowser|Quest|Pico/i.test(ua)) { type = 'dt_vr'; typeIc = '🥽'; } }
+      if (isTablet) { type = 'dt_tablet'; typeIc = 'tablet'; }
+      else if (isIPhone || isAndroid || ch.mobile || /Mobi|Phone/i.test(ua)) { type = 'dt_phone'; typeIc = 'phone'; }
+      else if (bat && (bat.charging === false || bat.level < 1 || (isFinite(bat.dischargingTime) && bat.dischargingTime > 0) || (bat.chargingTime > 0 && isFinite(bat.chargingTime)))) { type = 'dt_laptop'; typeIc = 'laptop'; }
+      else if (/Macintosh/.test(ua) && !isIPad) { type = 'dt_mac'; typeIc = 'laptop'; }
+      else if (gpuK === 'gk_integrated') { type = 'dt_pc'; typeIc = 'laptop'; }
+      if (/SMART-TV|SmartTV|Tizen|Web0S|webOS|AFT[A-Z]|BRAVIA|CrKey|GoogleTV|Android TV|HbbTV/i.test(ua)) { type = 'dt_tv'; typeIc = 'tv'; }
+      if (/PlayStation|Xbox|Nintendo/i.test(ua)) { type = 'dt_console'; typeIc = 'console'; }
+      if (/OculusBrowser|Quest|Pico|Vision/i.test(ua) && !isIPhone) { if (/OculusBrowser|Quest|Pico/i.test(ua)) { type = 'dt_vr'; typeIc = 'vr'; } }
 
       /* ---- Brand / model / chip ---- */
       var brand = '', model = '', name = '', est = false, chip = chipFromGPU(gpuName), chipEst = true;
@@ -320,7 +320,7 @@ DOT.detect = (function () {
           { k: 'r_touch', v: touch > 0 ? { k: 'touchYes', a: [touch] } : { k: 'no' } },
           { k: 'r_pointer', v: u.mq('(pointer: coarse)') ? { k: 'ptTouch' } : u.mq('(pointer: fine)') ? { k: 'ptMouse' } : null }
         ]},
-        { t: 'g_cpu', ic: '🧠', rows: [
+        { t: 'g_cpu', ic: 'cpu', rows: [
           { k: 'r_chip', v: chip, est: chip && chipEst },
           { k: 'r_threads', v: cores ? cores + ' Threads' : null },
           { k: 'r_arch', v: arch },
@@ -330,7 +330,7 @@ DOT.detect = (function () {
           { k: 'r_wasm', v: typeof WebAssembly === 'object' ? (wasmSimd() ? 'WASM + SIMD' : 'WASM') : { k: 'notSupported' } },
           { k: 'r_sab', v: S(typeof SharedArrayBuffer !== 'undefined') }
         ]},
-        { t: 'g_gpu', ic: '🎮', rows: [
+        { t: 'g_gpu', ic: 'gpu', rows: [
           { k: 'r_gpu', v: gpuName || null },
           { k: 'r_gpuVendor', v: gpuV },
           { k: 'r_gpuKind', v: gpuK ? { k: gpuK } : null },
@@ -349,7 +349,7 @@ DOT.detect = (function () {
           { k: 'r_wgInv', v: wg.maxWG || null },
           { k: 'r_wgBuf', v: wg.maxBuf ? u.GB(wg.maxBuf) || u.MB(wg.maxBuf) : null }
         ]},
-        { t: 'g_screen', ic: '🖼️', rows: [
+        { t: 'g_screen', ic: 'screen', rows: [
           { k: 'r_physRes', v: info.physW + ' × ' + info.physH },
           { k: 'r_cssRes', v: sw + ' × ' + sh },
           { k: 'r_dpr', v: dpr.toFixed(2) + '×' },
@@ -361,7 +361,7 @@ DOT.detect = (function () {
           { k: 'r_window', v: innerWidth + ' × ' + innerHeight },
           { k: 'r_multi', v: screen.isExtended != null ? Y(screen.isExtended) : null }
         ]},
-        { t: 'g_system', ic: '⚙️', rows: [
+        { t: 'g_system', ic: 'system', rows: [
           { k: 'r_os', v: O.os ? O.os + (O.v ? ' ' + O.v : '') : null, est: O.est },
           { k: 'r_browser', v: B.b ? B.b + (B.v ? ' ' + B.v : '') : null },
           { k: 'r_engine', v: B.engine },
@@ -371,7 +371,7 @@ DOT.detect = (function () {
           { k: 'r_dark', v: Y(u.mq('(prefers-color-scheme: dark)')) },
           { k: 'r_pwa', v: Y(u.mq('(display-mode: standalone)') || nav.standalone === true) }
         ]},
-        { t: 'g_power', ic: '🔋', rows: [
+        { t: 'g_power', ic: 'power', rows: [
           { k: 'r_battery', v: bat ? { k: bat.charging ? 'batCharging' : 'batLevel', a: [Math.round(bat.level * 100)] } : null, live: !!bat },
           { k: 'r_net', v: con && con.effectiveType ? con.effectiveType.toUpperCase() + (con.type && con.type !== 'unknown' ? ' · ' + con.type : '') : null },
           { k: 'r_down', v: con && con.downlink ? con.downlink + ' Mbps' : null, est: true },
@@ -380,7 +380,7 @@ DOT.detect = (function () {
           { k: 'r_storage', v: stor && stor.quota ? u.GB(stor.quota) : null },
           { k: 'r_codecs', v: codecStr || null }
         ]},
-        { t: 'g_features', ic: '🧩', rows: [
+        { t: 'g_features', ic: 'features', rows: [
           { k: 'r_webxr', v: S(!!nav.xr) },
           { k: 'r_webcodecs', v: S(!!window.VideoDecoder) },
           { k: 'r_offscreen', v: S(typeof OffscreenCanvas !== 'undefined') },

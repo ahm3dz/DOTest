@@ -69,7 +69,7 @@ DOT.agent = (function () {
       return '<div class="row"><span class="k">' + t(r[0]) + '</span><span class="v"><bdi>' + (r[2] ? v : u.esc(v)) + '</bdi></span></div>';
     }).join('');
   }
-  function card(ic, title, html) { return html ? '<div class="card ig"><h4><span class="ic">' + ic + '</span>' + title + '</h4>' + html + '</div>' : ''; }
+  function card(ic, title, html) { return html ? '<div class="card ig"><h4><span class="ic">' + DOT.icon(ic) + '</span>' + title + '</h4>' + html + '</div>' : ''; }
 
   function render() {
     var box = $('#agentOut'); if (!box) return;
@@ -77,35 +77,35 @@ DOT.agent = (function () {
     if (!data) { box.innerHTML = ''; return; }
     var d = data, h = [];
     var s = d.system, o = d.os;
-    h.push(card('🖥️', t('ag_system'), rows([['ag_pcname', s.name], ['r_brand', s.manufacturer], ['r_model', s.model], ['ag_family', s.family], ['ag_sku', s.sku], ['r_type', s.type], ['ag_serial', sec(s.serial), 1], ['ag_uuid', sec(s.uuid), 1], ['ag_chassis', sec(s.chassisSerial), 1]])));
-    h.push(card('🪟', t('r_os'), rows([['ag_osname', o.name], ['ag_ver', [o.displayVersion, o.version].filter(Boolean).join(' · ')], ['ag_build', o.build ? o.build + (o.ubr ? '.' + o.ubr : '') : null], ['r_arch', o.arch], ['ag_install', o.installDate ? o.installDate.slice(0, 10) : null], ['ag_uptime', o.uptimeHours != null ? o.uptimeHours + ' h' : null], ['ag_user', o.user]])));
+    h.push(card('device', t('ag_system'), rows([['ag_pcname', s.name], ['r_brand', s.manufacturer], ['r_model', s.model], ['ag_family', s.family], ['ag_sku', s.sku], ['r_type', s.type], ['ag_serial', sec(s.serial), 1], ['ag_uuid', sec(s.uuid), 1], ['ag_chassis', sec(s.chassisSerial), 1]])));
+    h.push(card('os', t('r_os'), rows([['ag_osname', o.name], ['ag_ver', [o.displayVersion, o.version].filter(Boolean).join(' · ')], ['ag_build', o.build ? o.build + (o.ubr ? '.' + o.ubr : '') : null], ['r_arch', o.arch], ['ag_install', o.installDate ? o.installDate.slice(0, 10) : null], ['ag_uptime', o.uptimeHours != null ? o.uptimeHours + ' h' : null], ['ag_user', o.user]])));
     d.cpu.forEach(function (c, i) {
-      h.push(card('🧠', t('g_cpu') + (d.cpu.length > 1 ? ' #' + (i + 1) : ''), rows([['ag_cpuname', c.name], ['r_brand', c.manufacturer], ['ag_cores', c.cores], ['ag_threads', c.threads],
+      h.push(card('cpu', t('g_cpu') + (d.cpu.length > 1 ? ' #' + (i + 1) : ''), rows([['ag_cpuname', c.name], ['r_brand', c.manufacturer], ['ag_cores', c.cores], ['ag_threads', c.threads],
         ['ag_pe', c.pcores ? c.pcores + ' P + ' + c.ecores + ' E' : null], ['ag_maxclock', c.maxClockMHz ? (c.maxClockMHz / 1000).toFixed(2) + ' GHz' : null], ['ag_curclock', c.currentClockMHz ? (c.currentClockMHz / 1000).toFixed(2) + ' GHz' : null],
         ['ag_l2', c.l2KB ? u.MB(c.l2KB * 1024) : null], ['ag_l3', c.l3KB ? u.MB(c.l3KB * 1024) : null], ['ag_socket', c.socket], ['ag_virt', c.virtualization != null ? String(c.virtualization) : null], ['ag_load', c.loadPercent != null ? c.loadPercent + '%' : null], ['ag_procid', sec(c.processorId), 1], ['ag_serial', sec(c.serial), 1]])));
     });
     var r = d.ram;
-    h.push(card('💾', t('r_ram'), rows([['ag_ramtotal', B(r.installedBytes || r.totalBytes)], ['ag_ramusable', B(r.totalBytes)], ['ag_slots', r.slots ? (r.modules.length + ' / ' + r.slots) : r.modules.length || null], ['ag_rammax', B(r.maxBytes)]]) +
+    h.push(card('ram', t('r_ram'), rows([['ag_ramtotal', B(r.installedBytes || r.totalBytes)], ['ag_ramusable', B(r.totalBytes)], ['ag_slots', r.slots ? (r.modules.length + ' / ' + r.slots) : r.modules.length || null], ['ag_rammax', B(r.maxBytes)]]) +
       r.modules.map(function (m) {
         return '<div class="sub-item"><b>' + u.esc(m.slot || 'RAM') + '</b>' + rows([['ag_cap', B(m.capacityBytes)], ['ag_type', [m.type, m.formFactor].filter(Boolean).join(' · ')], ['ag_speed', m.speedMHz ? m.speedMHz + ' MT/s' + (m.configuredMHz && m.configuredMHz !== m.speedMHz ? ' (' + m.configuredMHz + ')' : '') : null], ['r_brand', m.manufacturer], ['ag_part', m.partNumber], ['ag_serial', sec(m.serial), 1], ['ag_volt', m.voltageMV ? (m.voltageMV / 1000).toFixed(2) + ' V' : null]]) + '</div>';
       }).join('')));
     d.gpu.forEach(function (g) {
-      h.push(card('🎮', t('r_gpu'), rows([['ag_gpuname', g.name], ['r_gpuVendor', g.vendor], ['ag_vram', B(g.vramBytes)], ['ag_gcores', g.cores], ['ag_driver', g.driver], ['ag_drvdate', g.driverDate ? String(g.driverDate).slice(0, 10) : null], ['ag_res', g.resolution], ['r_hz', g.refreshHz ? g.refreshHz + ' Hz' : null]])));
+      h.push(card('gpu', t('r_gpu'), rows([['ag_gpuname', g.name], ['r_gpuVendor', g.vendor], ['ag_vram', B(g.vramBytes)], ['ag_gcores', g.cores], ['ag_driver', g.driver], ['ag_drvdate', g.driverDate ? String(g.driverDate).slice(0, 10) : null], ['ag_res', g.resolution], ['r_hz', g.refreshHz ? g.refreshHz + ' Hz' : null]])));
     });
     var mb = d.motherboard, bi = d.bios;
-    h.push(card('🧩', t('ag_board'), rows([['r_brand', mb.manufacturer], ['r_model', mb.product], ['ag_ver', mb.version], ['ag_serial', sec(mb.serial), 1], ['ag_bios', [bi.vendor, bi.version].filter(Boolean).join(' · ')], ['ag_biosdate', bi.date ? String(bi.date).slice(0, 10) : null], ['ag_bootmode', bi.mode], ['ag_secure', bi.secureBoot != null ? String(bi.secureBoot) : null], ['ag_tpm', d.tpm ? 'TPM ' + (d.tpm.version || '').split(',')[0] : null]])));
-    if (d.disks.length || d.volumes.length) h.push(card('💽', t('ag_disks'), d.disks.map(function (x) {
+    h.push(card('board', t('ag_board'), rows([['r_brand', mb.manufacturer], ['r_model', mb.product], ['ag_ver', mb.version], ['ag_serial', sec(mb.serial), 1], ['ag_bios', [bi.vendor, bi.version].filter(Boolean).join(' · ')], ['ag_biosdate', bi.date ? String(bi.date).slice(0, 10) : null], ['ag_bootmode', bi.mode], ['ag_secure', bi.secureBoot != null ? String(bi.secureBoot) : null], ['ag_tpm', d.tpm ? 'TPM ' + (d.tpm.version || '').split(',')[0] : null]])));
+    if (d.disks.length || d.volumes.length) h.push(card('disks', t('ag_disks'), d.disks.map(function (x) {
       return '<div class="sub-item"><b>' + u.esc(x.model || 'Disk') + '</b>' + rows([['ag_cap', B(x.sizeBytes)], ['ag_type', [x.media, x.bus || x.interface].filter(Boolean).join(' · ')], ['ag_health', x.health], ['ag_fw', x.firmware], ['ag_serial', sec(x.serial), 1]]) + '</div>';
     }).join('') + d.volumes.map(function (v) {
       var used = v.sizeBytes ? (1 - v.freeBytes / v.sizeBytes) * 100 : 0;
       return '<div class="vol"><span class="en">' + u.esc(v.drive || '') + '</span> <small>' + u.esc([v.label, v.fs].filter(Boolean).join(' · ')) + '</small><div class="bar"><i style="width:' + used + '%;background:' + (used > 90 ? '#ff4d5e' : 'var(--cy)') + '"></i></div><small class="en">' + B(v.sizeBytes - v.freeBytes) + ' / ' + B(v.sizeBytes) + '</small></div>';
     }).join('')));
-    if (d.network.length) h.push(card('🌐', t('ag_net'), d.network.map(function (n) {
+    if (d.network.length) h.push(card('network', t('ag_net'), d.network.map(function (n) {
       return '<div class="sub-item"><b>' + u.esc(n.name || '') + (n.conn ? ' · ' + u.esc(n.conn) : '') + '</b>' + rows([['ag_mac', sec(n.mac), 1], ['ag_ipv4', n.ipv4 && n.ipv4.length ? sec(n.ipv4.join(', ')) : null, 1], ['ag_ipv6', n.ipv6 && n.ipv6.length ? sec(n.ipv6.join(', ')) : null, 1], ['ag_mask', n.subnet], ['ag_gw', n.gateway], ['ag_dns', n.dns], ['ag_dhcp', n.dhcp != null ? String(n.dhcp) : null], ['ag_link', n.speedMbps ? n.speedMbps + ' Mbps' : null]]) + '</div>';
     }).join('')));
-    if (d.monitors.length) h.push(card('🖼️', t('ag_monitors'), d.monitors.map(function (m) { return '<div class="sub-item"><b>' + u.esc(m.model || m.manufacturer || 'Monitor') + '</b>' + rows([['r_brand', m.manufacturer], ['ag_pcode', m.productCode], ['ag_year', m.year], ['ag_serial', sec(m.serial), 1]]) + '</div>'; }).join('')));
-    if (d.battery) { var b = d.battery; h.push(card('🔋', t('r_battery'), rows([['r_model', b.name], ['tl_level', b.chargePercent != null ? b.chargePercent + '%' : null], ['ag_bhealth', b.healthPercent != null ? b.healthPercent + '%' : null], ['ag_design', b.designMWh ? (b.designMWh / 1000).toFixed(1) + ' Wh' : null], ['ag_fullcap', b.fullMWh ? (b.fullMWh / 1000).toFixed(1) + ' Wh' : null], ['ag_cycles', b.cycles], ['r_brand', b.manufacturer], ['ag_serial', sec(b.serial), 1]]))); }
-    if (d.audio.length) h.push(card('🔊', t('ag_audio'), rows([['ag_devices', d.audio]])));
+    if (d.monitors.length) h.push(card('monitors', t('ag_monitors'), d.monitors.map(function (m) { return '<div class="sub-item"><b>' + u.esc(m.model || m.manufacturer || 'Monitor') + '</b>' + rows([['r_brand', m.manufacturer], ['ag_pcode', m.productCode], ['ag_year', m.year], ['ag_serial', sec(m.serial), 1]]) + '</div>'; }).join('')));
+    if (d.battery) { var b = d.battery; h.push(card('battery', t('r_battery'), rows([['r_model', b.name], ['tl_level', b.chargePercent != null ? b.chargePercent + '%' : null], ['ag_bhealth', b.healthPercent != null ? b.healthPercent + '%' : null], ['ag_design', b.designMWh ? (b.designMWh / 1000).toFixed(1) + ' Wh' : null], ['ag_fullcap', b.fullMWh ? (b.fullMWh / 1000).toFixed(1) + ' Wh' : null], ['ag_cycles', b.cycles], ['r_brand', b.manufacturer], ['ag_serial', sec(b.serial), 1]]))); }
+    if (d.audio.length) h.push(card('audio', t('ag_audio'), rows([['ag_devices', d.audio]])));
     box.innerHTML = (d.sample ? '<div class="warn">' + t('ag_sample') + '</div>' : '') + '<div class="ag-head mu">' + t('ag_from', { p: d.platform, d: (d.generated || '').replace('T', ' ') }) + '</div><div class="info-grid">' + h.join('') + '</div>';
   }
 

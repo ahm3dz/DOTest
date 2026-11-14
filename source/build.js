@@ -22,7 +22,7 @@ const APP = [
   'js/config.js', 'js/i18n.js', 'js/utils.js', 'js/data/devices.js', 'js/detect.js',
   'js/bench/workers.js', 'js/bench/cpu.js', 'js/bench/ram.js', 'js/bench/shaders.js',
   'js/bench/gpu.js', 'js/bench/stress.js', 'js/net/speedtest.js', 'js/agent/agent.js',
-  'js/tools/tools.js', 'js/ui/settings.js', 'js/ui/charts.js', 'js/ui/hero3d.js',
+  'js/tools/tools.js', 'js/ui/settings.js', 'js/ui/icons.js', 'js/ui/charts.js', 'js/ui/hero3d.js',
   'js/ui/advice.js', 'js/ui/render.js', 'js/ui/network.js', 'js/app.js'
 ];
 

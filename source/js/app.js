@@ -57,7 +57,7 @@
     $('#modeDesc').textContent = t('md_' + S.mode);
     var x = S.level === 'extreme' || S.mode === 'stress';
     $('#startBtn').classList.toggle('x', x);
-    $('#startBtn').textContent = S.mode === 'stress' ? t('startStress') : S.level === 'extreme' ? t('startX') : t('start');
+    $('#startBtn').innerHTML = DOT.icon(S.mode === 'stress' ? 'stress' : 'play', 18) + '<span>' + (S.mode === 'stress' ? t('startStress') : S.level === 'extreme' ? t('startX') : t('start')) + '</span>';
     $('#warnX').hidden = !x;
     quick();
   }
@@ -66,10 +66,10 @@
     var st = DOT.settings.all();
     var seg = function (key, opts) { return '<div class="seg sm">' + opts.map(function (o) { return '<button class="' + (String(st[key]) === String(o[0]) ? 'on' : '') + '" data-k="' + key + '" data-v="' + o[0] + '">' + o[1] + '</button>'; }).join('') + '</div>'; };
     $('#quick').innerHTML =
-      '<div class="q"><span class="mu">🎨 ' + t('set_scene') + '</span>' + seg('scene', [['mandelbulb', t('sc_mandelbulb')], ['menger', t('sc_menger')]]) + '</div>' +
-      '<div class="q"><span class="mu">🖼️ ' + t('set_res') + '</span>' + seg('resMul', [[0.5, '50%'], [1, '100%'], [1.5, '150%'], [2, '200%']]) + '</div>' +
-      '<div class="q"><span class="mu">⏱️ ' + t('set_dur') + '</span>' + seg('durMul', [[0.5, '×0.5'], [1, '×1'], [2, '×2'], [3, '×3']]) + '</div>' +
-      '<button class="link-btn" id="moreSet">⚙️ ' + t('moreSettings') + '</button>';
+      '<div class="q"><span class="mu">' + t('set_scene') + '</span>' + seg('scene', [['mandelbulb', t('sc_mandelbulb')], ['menger', t('sc_menger')]]) + '</div>' +
+      '<div class="q"><span class="mu">' + t('set_res') + '</span>' + seg('resMul', [[0.5, '50%'], [1, '100%'], [1.5, '150%'], [2, '200%']]) + '</div>' +
+      '<div class="q"><span class="mu">' + t('set_dur') + '</span>' + seg('durMul', [[0.5, '×0.5'], [1, '×1'], [2, '×2'], [3, '×3']]) + '</div>' +
+      '<button class="link-btn" id="moreSet">' + t('moreSettings') + '</button>';
   }
   $('#quick').addEventListener('click', function (e) {
     if (e.target.id === 'moreSet') return DOT.settings.open();
@@ -205,7 +205,7 @@
     }).catch(function (e) {
       finish();
       if (e === 'abort' || ctl.abort) { $('#live').classList.remove('show'); u.toast(S.leftPage ? t('leftPage') : t('stopped')); S.leftPage = false; return; }
-      console.error(e); var msg = errMsg(e); setPhase('⚠️ ' + msg); u.toast(msg);
+      console.error(e); var msg = errMsg(e); setPhase('' + msg); u.toast(msg);
       if (res.cpuS || res.cpuM || res.gpu || res.ram) setTimeout(function () { $('#live').classList.remove('show'); showResults(res); }, 1800);
     });
   }
@@ -271,7 +271,8 @@
 
   /* ---------- about ---------- */
   function about() {
-    $('#featList').innerHTML = ['ft1', 'ft2', 'ft3', 'ft4', 'ft5', 'ft6', 'ft7', 'ft8', 'ft9', 'ft10'].map(function (k) { return '<li>' + t(k) + '</li>'; }).join('');
+    var fIc = { ft1: 'cpu', ft2: 'gpu', ft3: 'ram', ft4: 'activity', ft5: 'network', ft6: 'hardware', ft7: 'tools', ft8: 'about', ft9: 'image', ft10: 'about' };
+    $('#featList').innerHTML = ['ft1', 'ft2', 'ft3', 'ft4', 'ft5', 'ft6', 'ft7', 'ft8', 'ft9', 'ft10'].map(function (k) { return '<li>' + DOT.icon(fIc[k]) + t(k) + '</li>'; }).join('');
     var s = u.siteURL(); $('#siteLink').textContent = s || '—'; $('#siteLink').href = s || '#';
     $('#footHost').textContent = u.siteHost();
   }
@@ -283,6 +284,7 @@
   DOT.tools.bind(); DOT.agent.bind(); DOT.netUI.bind();
   setLang(u.store.get('lang', cfg.defaultLang));
   DOT.hero3d.init();
+  u.$$('[data-ic]').forEach(function (el) { el.insertAdjacentHTML('afterbegin', DOT.icon(el.dataset.ic, 18)); });
   route();
   DOT.detect.collect().then(function (I) {
     S.info = I; S.refresh = I.hz || 60; DOT.render.device(I);

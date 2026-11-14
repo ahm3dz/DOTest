@@ -407,3 +407,64 @@ footer small { display: block; color: var(--mu); font-size: 12px; margin-top: 6p
 .fps-line { display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px; color: var(--mu); margin-top: 6px; }
 .fps-line b { color: var(--tx); font-family: var(--mono); }
 @media (max-width: 640px) { .topbanner img { height: 92px; } }
+
+/* line icons */
+.ic-svg { display: inline-block; vertical-align: middle; flex-shrink: 0; }
+.ig h4 .ic { color: var(--cy); }
+.ig h4 .ic .ic-svg { width: 18px; height: 18px; }
+.tabs a .ic-svg { margin-inline-end: 7px; opacity: .85; }
+.tabs a.on .ic-svg { opacity: 1; }
+.chip .ic-svg { color: var(--cy); }
+.tool .ti .ic-svg { width: 26px; height: 26px; color: var(--cy); }
+.sub .h .ic-svg, .fg .l .ic-svg { color: var(--mu); }
+.nl span .ic-svg { color: var(--cy); margin-inline-end: 4px; }
+.ad-tag { font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 6px; flex-shrink: 0; letter-spacing: .3px; }
+.ad.good .ad-tag { background: rgba(34,229,138,.14); color: var(--gr); }
+.ad.warn .ad-tag { background: rgba(255,201,60,.14); color: var(--yl); }
+.ad.bad .ad-tag { background: rgba(255,77,94,.16); color: var(--rd); }
+.ad.info .ad-tag { background: rgba(0,229,255,.12); color: var(--cy); }
+.dl-os { display: inline-flex; align-items: center; gap: 7px; }
+
+/* ===== beautiful accent-colored icons (v3.2) ===== */
+.ic-svg { color: var(--cy); transition: color .2s; }
+/* card-header badge: accent gradient tile */
+.ig h4 .ic { width: 34px; height: 34px; border-radius: 11px; display: grid; place-items: center;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--cy) 22%, transparent), color-mix(in srgb, var(--pu) 18%, transparent));
+  border: 1px solid color-mix(in srgb, var(--cy) 35%, transparent); box-shadow: inset 0 0 12px color-mix(in srgb, var(--cy) 12%, transparent); }
+.ig h4 .ic .ic-svg { width: 19px; height: 19px; color: var(--cy); }
+/* chips */
+.chip .ic-svg { color: var(--cy); width: 16px; height: 16px; }
+/* nav */
+.tabs a .ic-svg { color: var(--mu); }
+.tabs a:hover .ic-svg { color: var(--tx); }
+.tabs a.on .ic-svg { color: #05060d; }
+/* tools: icon in a soft accent disc */
+.tool .ti { width: 46px; height: 46px; border-radius: 13px; display: grid; place-items: center; margin-bottom: 4px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--cy) 20%, transparent), color-mix(in srgb, var(--pu) 16%, transparent));
+  border: 1px solid color-mix(in srgb, var(--cy) 30%, transparent); }
+.tool .ti .ic-svg { width: 24px; height: 24px; color: var(--cy); }
+/* mode + level + action button icons */
+.mode .ic-svg, .lvl h3 .ic-svg { width: 17px; height: 17px; margin-inline-end: 6px; vertical-align: -3px; color: var(--cy); }
+.mode.on .ic-svg { color: var(--cy); }
+.lvl.x h3 .ic-svg { color: var(--pk); }
+.btn .ic-svg { width: 18px; height: 18px; margin-inline-end: 2px; }
+.btn-go .ic-svg { color: #05060d; }
+.btn-stop .ic-svg { color: #ff8a95; }
+.btn-ghost .ic-svg, .clear-btn .ic-svg, .link-btn .ic-svg { color: var(--cy); }
+.fsbtn .ic-svg { width: 15px; height: 15px; color: #fff; vertical-align: -2px; margin-inline-end: 4px; }
+/* net labels */
+.nl span .ic-svg { width: 15px; height: 15px; color: var(--cy); margin-inline-end: 5px; vertical-align: -3px; }
+/* sub-card + fps header small icons */
+.sub .h .ic-svg { width: 15px; height: 15px; margin-inline-end: 5px; vertical-align: -2px; color: var(--cy); }
+/* feature list */
+.feat li .ic-svg { width: 17px; height: 17px; margin-inline-end: 8px; vertical-align: -3px; color: var(--cy); }
+/* severity icons on advice */
+.ad .ad-ic { flex-shrink: 0; display: grid; place-items: center; width: 24px; height: 24px; }
+.ad .ad-ic .ic-svg { width: 20px; height: 20px; }
+.ad.good .ad-ic .ic-svg { color: var(--gr); }
+.ad.warn .ad-ic .ic-svg { color: var(--yl); }
+.ad.bad .ad-ic .ic-svg { color: var(--rd); }
+.ad.info .ad-ic .ic-svg { color: var(--cy); }
+/* OS download buttons */
+.st3 .dl a .ic-svg { width: 16px; height: 16px; margin-inline-end: 6px; vertical-align: -3px; color: var(--cy); }
+/* download-os helper spacing already set */

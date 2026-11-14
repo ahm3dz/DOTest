@@ -10,14 +10,14 @@ DOT.tools = (function () {
   var cleanup = null, audioCtx = null;
 
   var LIST = [
-    ['deadpixel', '🟥', 'tl_deadpixel'], ['gradient', '🌈', 'tl_gradient'], ['motion', '🏃', 'tl_motion'], ['touch', '👆', 'tl_touch'],
-    ['keyboard', '⌨️', 'tl_keyboard'], ['mouse', '🖱️', 'tl_mouse'], ['gamepad', '🎮', 'tl_gamepad'], ['speakers', '🔊', 'tl_speakers'],
-    ['storage', '💽', 'tl_storage'], ['battery', '🔋', 'tl_battery'], ['sensors', '🧭', 'tl_sensors'], ['vibration', '📳', 'tl_vibration']
+    ['deadpixel', 'tl_deadpixel'], ['gradient', 'tl_gradient'], ['motion', 'tl_motion'], ['touch', 'tl_touch'],
+    ['keyboard', 'tl_keyboard'], ['mouse', 'tl_mouse'], ['gamepad', 'tl_gamepad'], ['speakers', 'tl_speakers'],
+    ['storage', 'tl_storage'], ['battery', 'tl_battery'], ['sensors', 'tl_sensors'], ['vibration', 'tl_vibration']
   ];
 
   function grid() {
     $('#toolsGrid').innerHTML = LIST.map(function (x) {
-      return '<button class="tool card" data-tool="' + x[0] + '"><span class="ti">' + x[1] + '</span><b>' + t(x[2]) + '</b><small>' + t(x[2] + '_d') + '</small></button>';
+      return '<button class="tool card" data-tool="' + x[0] + '"><span class="ti">' + DOT.icon(x[0], 26) + '</span><b>' + t(x[1]) + '</b><small>' + t(x[1] + '_d') + '</small></button>';
     }).join('');
   }
 
@@ -134,7 +134,7 @@ DOT.tools = (function () {
     },
 
     speakers: function () {
-      modal(t('tl_speakers'), '<div class="seg big"><button data-p="-1">◀ ' + t('tl_left') + '</button><button data-p="0">● ' + t('tl_both') + '</button><button data-p="1">' + t('tl_right') + ' ▶</button></div><div class="set-row"><div class="set-l">' + t('tl_freq') + ': <b class="en" id="fV">440</b> Hz</div><input type="range" id="fR" min="20" max="20000" value="440" class="range"></div><div class="seg"><button id="sweep">' + t('tl_sweep') + '</button><button id="sStop">■ ' + t('stop') + '</button></div><p class="mu">' + t('tl_speakers_h') + '</p>');
+      modal(t('tl_speakers'), '<div class="seg big"><button data-p="-1">' + t('tl_left') + '</button><button data-p="0">' + t('tl_both') + '</button><button data-p="1">' + t('tl_right') + '</button></div><div class="set-row"><div class="set-l">' + t('tl_freq') + ': <b class="en" id="fV">440</b> Hz</div><input type="range" id="fR" min="20" max="20000" value="440" class="range"></div><div class="seg"><button id="sweep">' + t('tl_sweep') + '</button><button id="sStop">' + t('stop') + '</button></div><p class="mu">' + t('tl_speakers_h') + '</p>');
       var osc = null, pan = null, gain = null;
       function ctx() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); if (audioCtx.state === 'suspended') audioCtx.resume(); return audioCtx; }
       function play(p, freq) {
@@ -152,14 +152,14 @@ DOT.tools = (function () {
     },
 
     storage: function () {
-      modal(t('tl_storage'), '<div class="seg" id="dSeg"><button data-m="64">64MB</button><button class="on" data-m="256">256MB</button><button data-m="512">512MB</button><button data-m="1024">1GB</button></div><button class="btn btn-go sm" id="dGo">▶ ' + t('start') .replace('▶ ', '') + '</button><div class="fpsgrid" id="dRes" style="margin-top:14px"></div><p class="mu">' + t('tl_storage_h') + '</p>');
+      modal(t('tl_storage'), '<div class="seg" id="dSeg"><button data-m="64">64MB</button><button class="on" data-m="256">256MB</button><button data-m="512">512MB</button><button data-m="1024">1GB</button></div><button class="btn btn-go sm" id="dGo">' + t('tl_run') + '</button><div class="fpsgrid" id="dRes" style="margin-top:14px"></div><p class="mu">' + t('tl_storage_h') + '</p>');
       var mb = 256;
       $('#dSeg').onclick = function (e) { var b = e.target.closest('button'); if (!b) return; mb = +b.dataset.m; [].forEach.call(this.children, function (k) { k.classList.toggle('on', k === b); }); };
       $('#dGo').onclick = function () {
         var btn = this; btn.disabled = true; $('#dRes').innerHTML = '<div class="mu">…</div>';
         storageTest(mb, function (p) { $('#dRes').innerHTML = '<div class="mu">' + p + '</div>'; }).then(function (r) {
           $('#dRes').innerHTML = cell(t('tl_write'), r.write.toFixed(0) + ' MB/s', '#ff3d81') + cell(t('tl_read'), r.read.toFixed(0) + ' MB/s', '#00e5ff') + cell(t('tl_api'), r.api) + cell(t('tl_size'), mb + ' MB');
-        }, function (e) { $('#dRes').innerHTML = '<div class="mu">⚠️ ' + t('tl_storage_err') + ' (' + u.esc(e && e.message || e) + ')</div>'; }).finally(function () { btn.disabled = false; });
+        }, function (e) { $('#dRes').innerHTML = '<div class="mu">' + t('tl_storage_err') + ' (' + u.esc(e && e.message || e) + ')</div>'; }).finally(function () { btn.disabled = false; });
       };
     },
 
@@ -172,7 +172,7 @@ DOT.tools = (function () {
           if (b0 == null) b0 = b.level;
           vals.push(b.level * 100); if (vals.length > 300) vals.shift();
           var mins = (Date.now() - t0) / 60000, rate = mins > 0.5 ? (b0 - b.level) * 100 / mins * 60 : null;
-          $('#bBox').innerHTML = '<div class="fpsgrid">' + cell(t('tl_level'), Math.round(b.level * 100) + '%', '#22e58a') + cell(t('tl_state'), b.charging ? '⚡ ' + t('tl_charging') : t('tl_discharging')) +
+          $('#bBox').innerHTML = '<div class="fpsgrid">' + cell(t('tl_level'), Math.round(b.level * 100) + '%', '#22e58a') + cell(t('tl_state'), b.charging ? t('tl_charging') : t('tl_discharging')) +
             cell(t('tl_full'), isFinite(b.chargingTime) && b.chargingTime > 0 ? Math.round(b.chargingTime / 60) + ' min' : '—') + cell(t('tl_left_t'), isFinite(b.dischargingTime) ? Math.round(b.dischargingTime / 60) + ' min' : '—') +
             cell(t('tl_rate'), rate != null && !b.charging ? rate.toFixed(1) + '%/h' : '—') + '</div>';
           DOT.charts.spark($('#bCan'), vals, '#22e58a', 'battery %');

@@ -50,7 +50,7 @@ DOT.netUI = (function () {
     if (r.up && r.up.series) { var off = r.down && r.down.series.length ? r.down.series[r.down.series.length - 1].t + 0.5 : 0; ser.push({ data: r.up.series.map(function (p) { return { t: p.t + off, v: p.v }; }), color: '#a855f7', fill: true }); }
     if (ser.length) DOT.charts.lines($('#netChart'), ser, { yLabel: 'Mbps' });
     $('#netUsagePanel').hidden = false;
-    $('#netUsage').innerHTML = DOT.net.usage(r).map(function (x) { return '<span class="uchip ' + (x[1] ? 'ok' : 'no') + '">' + (x[1] ? '✔' : '✘') + ' ' + t(x[0]) + '</span>'; }).join('');
+    $('#netUsage').innerHTML = DOT.net.usage(r).map(function (x) { return '<span class="uchip ' + (x[1] ? 'ok' : 'no') + '">' + DOT.icon(x[1] ? 'check' : 'close', 14) + ' ' + t(x[0]) + '</span>'; }).join('');
     if (r.ip) showIP(r.ip);
   }
 
@@ -65,7 +65,7 @@ DOT.netUI = (function () {
   function history() {
     var h = u.store.get('netHist', []);
     $('#netHist').innerHTML = h.length ? h.map(function (x) {
-      return '<div class="hi"><div><b class="en">⬇ ' + sp(x.d) + ' · ⬆ ' + sp(x.u) + ' ' + unit() + '</b><div class="mu"><span class="ltr">' + new Date(x.t).toLocaleString(DOT.lang === 'ar' ? 'ar-SA-u-nu-latn' : 'en-US') + '</span> · <span class="en">' + (x.p != null ? x.p.toFixed(0) + ' ms' : '') + (x.isp ? ' · ' + u.esc(x.isp) : '') + '</span></div></div><div class="s en">' + (x.g || '') + '</div></div>';
+      return '<div class="hi"><div><b class="en">\u2193 ' + sp(x.d) + ' / \u2191 ' + sp(x.u) + ' ' + unit() + '</b><div class="mu"><span class="ltr">' + new Date(x.t).toLocaleString(DOT.lang === 'ar' ? 'ar-SA-u-nu-latn' : 'en-US') + '</span> · <span class="en">' + (x.p != null ? x.p.toFixed(0) + ' ms' : '') + (x.isp ? ' · ' + u.esc(x.isp) : '') + '</span></div></div><div class="s en">' + (x.g || '') + '</div></div>';
     }).join('') : '<div class="empty">' + t('histEmpty') + '</div>';
   }
 
@@ -93,7 +93,7 @@ DOT.netUI = (function () {
       document.dispatchEvent(new CustomEvent('dot:net'));
     }).catch(function (e) {
       if (e === 'abort') { u.toast(t('stopped')); return; }
-      $('#netMsg').textContent = '⚠️ ' + t('netErr'); $('#gStage').textContent = '';
+      $('#netMsg').textContent = '' + t('netErr'); $('#gStage').textContent = '';
     }).then(function () { ctl = null; $('#netGo').hidden = false; $('#netStop').hidden = true; });
   }
   function strip(r) { var c = JSON.parse(JSON.stringify(r)); if (c.ping) delete c.ping.samples; return c; }
@@ -104,7 +104,7 @@ DOT.netUI = (function () {
     $('#netStop').onclick = function () { if (ctl) ctl.abort = true; };
     $('#ipBtn').onclick = function () {
       $('#ipBox').innerHTML = '<div class="mu">…</div>';
-      DOT.net.ipInfo().then(showIP, function () { $('#ipBox').innerHTML = '<div class="mu">⚠️ ' + t('netErr') + '</div>'; });
+      DOT.net.ipInfo().then(showIP, function () { $('#ipBox').innerHTML = '<div class="mu">' + t('netErr') + '</div>'; });
     };
     $('#ipBox').addEventListener('click', function (e) { var s = e.target.closest('.serial'); if (s) s.classList.toggle('show'); });
     document.addEventListener('dot:settings', function () { if (last) results(last); else drawGauge(0); history(); if (ipData) showIP(ipData); });
