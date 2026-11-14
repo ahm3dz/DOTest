@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#05060d">
+<meta name="description" content="DOTest — CPU, GPU, RAM & Internet benchmark for every device. By Ahmed Al-Zahrani">
+<meta name="author" content="Ahmed Al-Zahrani">
+<meta property="og:title" content="DOTest — دوت تست">
+<meta property="og:description" content="CPU · GPU · RAM · Internet benchmark — Ahmed Al-Zahrani">
+<title>DOTest — دوت تست | CPU · GPU · RAM · Internet</title>
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/apple-touch.png">
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ================= HEADER ================= -->
+  <header>
+    <div class="brand">
+      <img src="assets/logo.png" alt="DOTest" class="logo">
+      <div>
+        <h1 class="en"><b>DOT</b>est</h1>
+        <small data-i18n="tagline"></small>
+      </div>
+    </div>
+    <div class="hdr-actions">
+      <button class="icon-btn" id="settingsBtn" aria-label="Settings">⚙️ <span data-i18n="settings"></span></button>
+      <button class="lang-btn" id="langBtn" aria-label="Language"><span class="en">EN</span> / عربي</button>
+    </div>
+  </header>
+
+  <!-- ================= NAV ================= -->
+  <nav class="tabs" id="tabs">
+    <a href="#tests" data-v="tests">🧪 <span data-i18n="nav_tests"></span></a>
+    <a href="#specs" data-v="specs">📋 <span data-i18n="nav_specs"></span></a>
+    <a href="#network" data-v="network">🌐 <span data-i18n="nav_net"></span></a>
+    <a href="#hardware" data-v="hardware">🛠️ <span data-i18n="nav_hw"></span></a>
+    <a href="#tools" data-v="tools">🧰 <span data-i18n="nav_tools"></span></a>
+    <a href="#history" data-v="history">🕘 <span data-i18n="nav_hist"></span></a>
+    <a href="#about" data-v="about">ℹ️ <span data-i18n="nav_about"></span></a>
+  </nav>
+
+  <!-- ================= VIEW: TESTS ================= -->
+  <section class="view" data-view="tests">
+    <div class="topbanner" aria-hidden="true"><img src="assets/banner.png" alt="DOTest"></div>
+    <div class="hero">
+      <div class="card hero-main">
+        <div class="kicker" data-i18n="detected"></div>
+        <div class="devname" id="devName"><span class="skeleton"></span></div>
+        <div class="devsub" id="devSub"><span class="skeleton" style="width:40%"></span></div>
+        <div class="chips" id="chips"></div>
+        <a class="exact-link" href="#hardware" id="exactLink" data-i18n="getExact"></a>
+      </div>
+      <div class="card hero-art">
+        <img src="assets/banner.png" alt="" aria-hidden="true" class="hero-fallback">
+        <canvas id="heroGL" aria-hidden="true"></canvas>
+      </div>
+    </div>
+
+    <div class="card panel" id="controls">
+      <div class="ptitle"><span class="dot"></span><span data-i18n="chooseLevel"></span></div>
+      <div class="levels" id="levels">
+        <button class="lvl" data-l="light"><h3>⚡ <span data-i18n="lv_light"></span></h3><p data-i18n="lv_light_d"></p><div class="bars"><span class="f"></span><span></span><span></span><span></span></div></button>
+        <button class="lvl on" data-l="medium"><h3>🔷 <span data-i18n="lv_medium"></span></h3><p data-i18n="lv_medium_d"></p><div class="bars"><span class="f"></span><span class="f"></span><span></span><span></span></div></button>
+        <button class="lvl" data-l="heavy"><h3>🔥 <span data-i18n="lv_heavy"></span></h3><p data-i18n="lv_heavy_d"></p><div class="bars"><span class="f"></span><span class="f"></span><span class="f"></span><span></span></div></button>
+        <button class="lvl x" data-l="extreme"><h3>☄️ <span class="xt" data-i18n="lv_extreme"></span></h3><p data-i18n="lv_extreme_d"></p><div class="bars"><span class="f"></span><span class="f"></span><span class="f"></span><span class="f"></span></div></button>
+      </div>
+
+      <div class="ptitle sm"><span class="dot"></span><span data-i18n="chooseMode"></span></div>
+      <div class="modes" id="modes">
+        <button class="mode on" data-m="full">🧪 <span data-i18n="m_full"></span></button>
+        <button class="mode" data-m="cpu">🧠 <span data-i18n="m_cpu"></span></button>
+        <button class="mode" data-m="gpu">🎮 <span data-i18n="m_gpu"></span></button>
+        <button class="mode" data-m="ram">💾 <span data-i18n="m_ram"></span></button>
+        <button class="mode stress" data-m="stress">🌋 <span data-i18n="m_stress"></span></button>
+      </div>
+      <p class="mode-desc" id="modeDesc"></p>
+      <div class="quick" id="quick"></div>
+
+      <div class="start-row">
+        <button class="btn btn-go" id="startBtn"></button>
+        <span class="est" id="est"></span>
+      </div>
+      <div class="warn" id="warnX" hidden data-i18n="warnExtreme"></div>
+    </div>
+
+    <!-- live -->
+    <div class="card panel" id="live">
+      <div class="ptitle"><span class="dot pulse"></span><span id="liveTitle"></span></div>
+      <div class="stage" id="stage">
+        <canvas id="gl"></canvas>
+        <div class="hud" id="hud">
+          <div class="hud-top">
+            <div class="fpsbox"><div class="v en" id="hudFps">--</div><div class="l en">FPS</div></div>
+            <div class="hudinfo en" id="hudInfo"></div>
+          </div>
+          <div class="hud-bot">
+            <span class="hud-wm en" id="hudWm">DOTest · Ahmed Al-Zahrani</span>
+            <button class="fsbtn" id="fsBtn">⛶ <span data-i18n="fullscreen"></span></button>
+          </div>
+        </div>
+        <div class="cpuview" id="cpuview">
+          <div class="cpuhead">
+            <div><div class="mu" id="cpuLbl"></div><div class="big en" id="cpuLive">0</div></div>
+            <div class="mu end"><span id="cpuUnit"></span><br><span class="en" id="cpuThreads"></span></div>
+          </div>
+          <div class="threads" id="threads"></div>
+        </div>
+      </div>
+      <div class="stress-live" id="stressLive" hidden>
+        <div class="sl"><span class="mu" data-i18n="s_cpu"></span><b class="en" id="slCpu">0</b></div>
+        <div class="sl"><span class="mu" data-i18n="s_gpu"></span><b class="en" id="slGpu">0</b></div>
+        <div class="sl"><span class="mu" data-i18n="s_ram"></span><b class="en" id="slRam">0</b></div>
+        <div class="sl"><span class="mu" data-i18n="s_time"></span><b class="en" id="slTime">0</b></div>
+      </div>
+      <canvas id="ft" class="chart-sm"></canvas>
+      <div class="prog">
+        <div class="prog-top"><b id="phase"></b><span class="en" id="pct">0%</span></div>
+        <div class="ptrack"><i id="pbar"></i></div>
+        <div class="steps" id="steps"></div>
+      </div>
+      <div class="start-row">
+        <button class="btn btn-stop" id="stopBtn">■ <span data-i18n="stop"></span></button>
+        <span class="est" data-i18n="dontLeave"></span>
+      </div>
+    </div>
+
+    <!-- results -->
+    <div id="results">
+      <div class="res-top">
+        <div class="card scorecard" id="scorecard">
+          <div class="ptitle center"><span class="dot"></span><span data-i18n="finalScore"></span></div>
+          <div class="ring">
+            <svg viewBox="0 0 200 200">
+              <defs>
+                <linearGradient id="rg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#00e5ff"/><stop offset="1" stop-color="#a855f7"/></linearGradient>
+                <linearGradient id="rg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff3d81"/><stop offset="1" stop-color="#ffc93c"/></linearGradient>
+              </defs>
+              <circle cx="100" cy="100" r="86" stroke="rgba(255,255,255,.07)" stroke-width="14" fill="none"/>
+              <circle id="ringC" cx="100" cy="100" r="86" stroke="url(#rg1)" stroke-width="14" fill="none" stroke-linecap="round" stroke-dasharray="540.35" stroke-dashoffset="540.35"/>
+            </svg>
+            <div class="c"><div class="s en" id="totScore">0</div><div class="sl en">DOTest Score</div></div>
+          </div>
+          <div class="tier" id="tier"></div>
+          <div class="cmp" id="cmp"></div>
+          <div class="res-meta" id="resMeta"></div>
+        </div>
+        <div class="res-side">
+          <div class="subs" id="subs"></div>
+          <div class="card panel" id="cpuPanel">
+            <div class="ptitle"><span class="dot"></span><span data-i18n="cpuDetails"></span></div>
+            <div class="cats" id="cats"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card panel" id="advPanel">
+        <div class="ptitle"><span class="dot"></span><span data-i18n="advice"></span></div>
+        <div class="adv" id="adv"></div>
+      </div>
+
+      <div class="card panel" id="fpsPanel">
+        <div class="ptitle"><span class="dot"></span><span data-i18n="fpsDetails"></span></div>
+        <div class="fpsgrid" id="fpsgrid"></div>
+        <canvas id="fpschart" class="chart"></canvas>
+        <div class="note-sm" id="fpsNote"></div>
+      </div>
+      <div class="card panel" id="ramPanel">
+        <div class="ptitle"><span class="dot"></span><span data-i18n="ramDetails"></span></div>
+        <div class="fpsgrid" id="ramgrid"></div>
+        <div class="note-sm" id="ramNote"></div>
+      </div>
+      <div class="card panel" id="stressPanel">
+        <div class="ptitle"><span class="dot"></span><span data-i18n="stressDetails"></span></div>
+        <div class="fpsgrid" id="stressgrid"></div>
+        <canvas id="stresschart" class="chart tall"></canvas>
+        <div class="legend" id="stressLegend"></div>
+        <div class="note-sm" id="stressNote"></div>
+      </div>
+      <div class="actions">
+        <button class="btn btn-go" id="againBtn">↻ <span data-i18n="retest"></span></button>
+        <button class="btn btn-ghost" id="imgBtn">🖼️ <span data-i18n="saveImg"></span></button>
+        <button class="btn btn-ghost" id="copyBtn">📋 <span data-i18n="copy"></span></button>
+        <button class="btn btn-ghost" id="jsonBtn">📄 <span data-i18n="saveJson"></span></button>
+      </div>
+      <div class="card panel img-preview" id="imgPrev" hidden>
+        <div class="ptitle"><span class="dot"></span><span data-i18n="imgPreview"></span></div>
+        <img id="imgOut" alt="DOTest result">
+        <p class="note-sm" data-i18n="imgHint"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= VIEW: SPECS ================= -->
+  <section class="view" data-view="specs">
+    <div class="ptitle lg"><span class="dot"></span><span data-i18n="allSpecs"></span></div>
+    <div class="cta card" id="specsCta"><span data-i18n="ctaExact"></span><a class="btn btn-ghost" href="#hardware" data-i18n="ctaExactBtn"></a></div>
+    <div class="info-grid" id="info"></div>
+    <div class="note" data-i18n-html="privacyNote"></div>
+  </section>
+
+  <!-- ================= VIEW: NETWORK ================= -->
+  <section class="view" data-view="network">
+    <div class="card panel net-main">
+      <div class="ptitle"><span class="dot"></span><span data-i18n="netTitle"></span></div>
+      <div class="net-grid">
+        <div class="gauge-wrap">
+          <svg class="gauge" viewBox="0 0 300 220" id="gauge"></svg>
+          <div class="gauge-c"><div class="gv en" id="gVal">0</div><div class="gu en" id="gUnit">Mbps</div><div class="gs" id="gStage"></div></div>
+        </div>
+        <div class="net-live">
+          <div class="nl"><span>📶 <span data-i18n="n_ping"></span></span><b class="en" id="nPing">—</b></div>
+          <div class="nl"><span>〰️ <span data-i18n="n_jitter"></span></span><b class="en" id="nJit">—</b></div>
+          <div class="nl"><span>⬇️ <span data-i18n="n_down"></span></span><b class="en" id="nDown">—</b></div>
+          <div class="nl"><span>⬆️ <span data-i18n="n_up"></span></span><b class="en" id="nUp">—</b></div>
+          <div class="nl"><span>⏳ <span data-i18n="n_loaded"></span></span><b class="en" id="nLoaded">—</b></div>
+          <div class="nl"><span>🏅 <span data-i18n="n_grade"></span></span><b class="en" id="nGrade">—</b></div>
+        </div>
+      </div>
+      <canvas id="netChart" class="chart"></canvas>
+      <div class="start-row">
+        <button class="btn btn-go" id="netGo">▶ <span data-i18n="netStart"></span></button>
+        <button class="btn btn-stop" id="netStop" hidden>■ <span data-i18n="stop"></span></button>
+        <span class="est" id="netMsg" data-i18n="netNote"></span>
+      </div>
+    </div>
+    <div class="card panel" id="netUsagePanel" hidden>
+      <div class="ptitle"><span class="dot"></span><span data-i18n="netUsage"></span></div>
+      <div class="usage" id="netUsage"></div>
+    </div>
+    <div class="card panel">
+      <div class="ptitle"><span class="dot"></span><span data-i18n="ipTitle"></span>
+        <button class="clear-btn" id="ipBtn" data-i18n="ipShow"></button></div>
+      <div class="fpsgrid" id="ipBox"><div class="mu" data-i18n="ipHint"></div></div>
+    </div>
+    <div class="card panel">
+      <div class="ptitle"><span class="dot"></span><span data-i18n="netHist"></span></div>
+      <div class="hist" id="netHist"></div>
+    </div>
+  </section>
+
+  <!-- ================= VIEW: HARDWARE AGENT ================= -->
+  <section class="view" data-view="hardware">
+    <div class="card panel">
+      <div class="ptitle lg"><span class="dot"></span><span data-i18n="hwTitle"></span></div>
+      <p class="lead" data-i18n="hwLead"></p>
+      <div class="steps-3">
+        <div class="st3"><span class="n en">1</span><b data-i18n="hw1"></b>
+          <div class="dl">
+            <a class="btn btn-ghost" href="agent/DOTest-Agent.bat" download>🪟 Windows (.bat)</a>
+            <a class="btn btn-ghost" href="agent/DOTest-Agent-mac.command" download>🍎 macOS</a>
+            <a class="btn btn-ghost" href="agent/dotest-agent-linux.py" download>🐧 Linux</a>
+          </div>
+          <button class="link-btn" id="agentCopyCmd" data-i18n="hwCopyCmd"></button>
+        </div>
+        <div class="st3"><span class="n en">2</span><b data-i18n="hw2"></b><p class="mu" data-i18n="hw2d"></p></div>
+        <div class="st3"><span class="n en">3</span><b data-i18n="hw3"></b>
+          <label class="drop" id="agentDrop"><input type="file" id="agentFile" accept=".json,application/json" hidden><span data-i18n="hwDrop"></span></label>
+          <textarea id="agentPaste" class="paste" rows="2" data-i18n-ph="hwPaste"></textarea>
+          <div class="row-btns"><button class="btn btn-ghost sm" id="agentPasteBtn" data-i18n="hwLoad"></button><button class="link-btn" id="agentSample" data-i18n="hwSample"></button></div>
+        </div>
+      </div>
+      <div class="note" data-i18n-html="hwPrivacy"></div>
+      <div class="row-btns end">
+        <button class="btn btn-ghost sm" id="agentReveal" hidden data-i18n="ag_show"></button>
+        <button class="btn btn-stop sm" id="agentClear" hidden data-i18n="ag_forget"></button>
+      </div>
+    </div>
+    <div id="agentOut"></div>
+  </section>
+
+  <!-- ================= VIEW: TOOLS ================= -->
+  <section class="view" data-view="tools">
+    <div class="ptitle lg"><span class="dot"></span><span data-i18n="toolsTitle"></span></div>
+    <div class="tools-grid" id="toolsGrid"></div>
+  </section>
+
+  <!-- ================= VIEW: HISTORY ================= -->
+  <section class="view" data-view="history">
+    <div class="card panel">
+      <div class="ptitle"><span class="dot"></span><span data-i18n="bestScores"></span></div>
+      <div class="fpsgrid" id="best"></div>
+    </div>
+    <div class="card panel">
+      <div class="ptitle"><span class="dot"></span><span data-i18n="history"></span>
+        <button class="clear-btn" id="exportHist" data-i18n="exportCsv"></button><button class="clear-btn" id="clearHist" data-i18n="clear"></button></div>
+      <canvas id="histChart" class="chart"></canvas>
+      <div class="hist" id="hist"></div>
+    </div>
+  </section>
+
+  <!-- ================= VIEW: ABOUT ================= -->
+  <section class="view" data-view="about">
+    <div class="card panel about">
+      <img src="assets/logo.png" alt="" class="about-logo">
+      <h2 class="en">DOTest <small id="ver2"></small></h2>
+      <p data-i18n="aboutLead"></p>
+      <ul class="feat" id="featList"></ul>
+      <div class="note" data-i18n-html="aboutPrivacy"></div>
+      <p class="mu"><span data-i18n="siteLink"></span>: <a class="en" id="siteLink" href="#"></a></p>
+    </div>
+  </section>
+
+  <!-- ================= FOOTER ================= -->
+  <footer>
+    <div class="fb"><img src="assets/logo.png" alt=""><span class="en fbn">DOTest</span><span class="ver en" id="ver"></span></div>
+    <div class="cr">© <span class="en" id="yr"></span> <span class="en grad">Ahmed Al-Zahrani</span> — <span data-i18n="rights"></span></div>
+    <small><span data-i18n="madeBy"></span> <span class="en">Ahmed Al-Zahrani</span> · <span class="en" id="footHost"></span></small>
+  </footer>
+</div>
+
+<!-- ================= MODALS ================= -->
+<div class="modal" id="settingsModal" hidden>
+  <div class="modal-box card">
+    <div class="modal-head"><b>⚙️ <span data-i18n="settings"></span></b><button class="x" id="settingsClose" aria-label="Close">✕</button></div>
+    <div class="modal-body" id="settingsBody"></div>
+    <div class="modal-foot"><button class="btn btn-ghost sm" id="settingsReset" data-i18n="resetSettings"></button></div>
+  </div>
+</div>
+<div class="modal" id="toolModal" hidden>
+  <div class="modal-box card wide">
+    <div class="modal-head"><b id="toolTitle"></b><button class="x" id="toolClose" aria-label="Close">✕</button></div>
+    <div class="modal-body" id="toolBody"></div>
+  </div>
+</div>
+<div class="fs-overlay" id="fsOverlay" hidden><span></span></div>
+<div class="toast" id="toast"></div>
+
+<!-- Scripts (order matters) -->
+<script src="js/vendor/qrcode.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/data/devices.js"></script>
+<script src="js/detect.js"></script>
+<script src="js/bench/kernels.js"></script>
+<script src="js/bench/workers.js"></script>
+<script src="js/bench/cpu.js"></script>
+<script src="js/bench/ram.js"></script>
+<script src="js/bench/shaders.js"></script>
+<script src="js/bench/gpu.js"></script>
+<script src="js/bench/stress.js"></script>
+<script src="js/net/speedtest.js"></script>
+<script src="js/agent/agent.js"></script>
+<script src="js/tools/tools.js"></script>
+<script src="js/ui/settings.js"></script>
+<script src="js/ui/charts.js"></script>
+<script src="js/ui/hero3d.js"></script>
+<script src="js/ui/advice.js"></script>
+<script src="js/ui/render.js"></script>
+<script src="js/ui/network.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

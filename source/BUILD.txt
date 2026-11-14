@@ -1,0 +1,6 @@
+To rebuild the obfuscated site from this source:
+  1) install Node.js
+  2) in this folder run:  npm i -D terser javascript-obfuscator clean-css
+  3) run:  node build.js
+  4) upload the generated  dist/  folder to your domain.
+Edit any file in js/ or css/ then rebuild. Texts: js/i18n.js. Settings: js/config.js.
